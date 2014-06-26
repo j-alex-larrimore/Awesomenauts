@@ -5,7 +5,7 @@ game.TitleScreen = me.ScreenObject.extend({
 	onResetEvent: function() {	
 		; // TODO
 	},
-	
+                
 	
 	/**	
 	 *  action to perform when leaving this screen (state change)
