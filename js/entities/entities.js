@@ -6,6 +6,13 @@ game.PlayerEntity = me.ObjectEntity.extend({
        settings.width = 70;
        settings.height = 80;
        this.parent(x, y, settings);
+       this.last = new Date().getTime();
+       this.now = new Date().getTime();
+       this.lastHit = new Date().getTime();
+       this.facing = "right";
+       this.type = me.game.PlayerEntity;
+       this.maxHealth = 10;
+       this.health = 10;
        
        this.collidable = true;
        
@@ -18,13 +25,24 @@ game.PlayerEntity = me.ObjectEntity.extend({
        
        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
    }, 
+           
+   
+  
+          
     
    update: function(delta){
+       var minimapx = this.pos.x*0.06;
+       var minimapy = this.pos.x*0.06;
+       console.log(minimapx);
+       
        if(me.input.isKeyPressed("right")){
+           this.facing = "right";
            this.vel.x += this.accel.x * me.timer.tick;
            this.flipX(false);
+           
        }
        else if(me.input.isKeyPressed("left")){
+           this.facing = "left";
            this.flipX(true);
            this.vel.x -= this.accel.x * me.timer.tick;
        }
@@ -43,7 +61,9 @@ game.PlayerEntity = me.ObjectEntity.extend({
        }
        
        if(me.input.isKeyPressed("attack")){
-           if(!this.renderable.isCurrentAnimation("attack")){
+           this.now = new Date().getTime();
+           if(!this.renderable.isCurrentAnimation("attack") && (this.now-this.last >= 1000)){
+               this.last = this.now;
                this.renderable.setCurrentAnimation("attack", "idle");
                this.renderable.setAnimationFrame();
            }
@@ -57,12 +77,31 @@ game.PlayerEntity = me.ObjectEntity.extend({
        var collision = me.game.world.collide(this);
        
        if(collision){
+           this.now = new Date().getTime();
            if(collision.obj.type === me.game.BaseEntity){
-               if(this.renderable.isCurrentAnimation("attack")){
-                   console.log("ouch1");
-                   //me.game.BaseEntity.loseHealth(1);
-                  // base.loseHealth(1);
-                  collision.obj.loseHealth(1);
+               var ydif = this.pos.y - collision.obj.pos.y;
+               var xdif = this.pos.x - collision.obj.pos.x;
+               console.log(xdif, ydif);
+               if(ydif < -70){
+                   this.falling = false;
+                   this.vel.y = 0;
+                   this.pos.y = this.pos.y - 1;
+               }
+              else if((xdif > 0)&&(ydif > -70)){
+                this.vel.x = 0;
+                this.pos.x = this.pos.x + 1;
+               }
+               else if((xdif < 0)&&(ydif > -70)){
+                   this.vel.x = 0;
+                   this.pos.x = this.pos.x - 1;
+               }
+               
+               if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-collision.obj.pos.y)<=30)){
+                    if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < collision.obj.pos.x))){
+                        this.lastHit = this.now;
+                        console.log(this.pos.x, this.pos.y, collision.obj.pos.x, collision.obj.pos.y);
+                        collision.obj.loseHealth(1);
+                    }
                }
            }
        }
@@ -106,6 +145,9 @@ game.BaseEntity = me.ObjectEntity.extend({
        this.health = 5;
        this.collidable = true;
        
+       this.cacheBounds = new me.Rect(new me.Vector2d(), 0, 0);
+       //this.cacheBounds = entity.getShape().getBounds(this.cacheBounds).width; need an 
+       
        this.renderable.addAnimation("idle", [0]);
        this.renderable.addAnimation("broken", [1]);
        
@@ -122,12 +164,41 @@ game.BaseEntity = me.ObjectEntity.extend({
            this.renderable.setCurrentAnimation("broken");
        }
       
+      
        
    },
            
    loseHealth: function(dmg){
        console.log("ouch");
        this.health = this.health - dmg;
+   },
+   
+   onCollision: function(object){
+       if(object.type === me.game.PlayerEntity){
+           
+       }
+           
    }
    
+});
+
+var CanvasEntity = me.SpriteObject.extend({
+   init : function (x, y, r, settings) {       
+       settings.image = document.createElement("canvas");
+       settings.image.width = (r + 2) * 2;
+       settings.image.height = (r + 2) * 2;
+       settings.image.spriteheight = (r + 2) * 2;
+       settings.image.spritewidth = (r + 2) * 2;
+       
+       var ctx = settings.image.getContext("2d");
+       ctx.fillStyle = "rgba(0, 192, 32, 0.75)";
+       ctx.strokeStyle = "blue";
+       ctx.lineWidth = 5;
+       
+       ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
+       ctx.fill();
+       ctx.stroke();
+       
+       this.parent(x, y, settings.image, settings.spritewidth, settings.spriteheight);
+   }
 });

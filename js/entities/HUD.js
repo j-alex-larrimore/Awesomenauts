@@ -1,5 +1,3 @@
-
-
 /**
  * a HUD container and child items
  */
@@ -25,8 +23,16 @@ game.HUD.Container = me.ObjectContainer.extend({
 		// give a name
 		this.name = "HUD";
 		
+                 //var range = new CanvasEntity(40, 400, 10, {});
+           
+                            
+                //me.game.world.addChild(range, 80);
+                //me.game.world.sort();
+                
 		// add our child score object at the top left corner
 		this.addChild(new game.HUD.ScoreItem(5, 5));
+                this.addChild(new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2")));
+                this.addChild(new CanvasEntity(40, 400, 10, {}));
 	}
 });
 
@@ -72,3 +78,17 @@ game.HUD.ScoreItem = me.Renderable.extend({
 	}
 
 });
+
+game.HUD.MiniMap = me.SpriteObject.extend({
+    
+    init: function (x, y, image){
+        this.parent(x, y, image);
+        this.x = x;
+        this.y = y;
+        this.floating = true;
+        this.anchorPoint = new me.Vector2d(0,0);
+    }
+    
+});
+
+
