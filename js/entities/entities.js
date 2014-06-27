@@ -1,15 +1,16 @@
 game.PlayerEntity = me.ObjectEntity.extend({
    init: function (x, y, settings){
        settings.image = "player-img";
-       settings.spritewidth = "64";
-       settings.spriteheight = "72";
-       settings.width = 64;
-       settings.height = 72;
+       settings.spritewidth = "70";
+       settings.spriteheight = "80";
+       settings.width = 70;
+       settings.height = 80;
        this.parent(x, y, settings);
        
        this.collidable = true;
        
        this.renderable.addAnimation("idle", [0]);
+       this.renderable.addAnimation("attack", [4, 5, 6, 7], 80);
        //this.renderable.addAnimation("run", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], 30);
        this.renderable.setCurrentAnimation("idle");
        
@@ -31,18 +32,21 @@ game.PlayerEntity = me.ObjectEntity.extend({
            this.vel.x = 0;
        }
        
-       if(me.input.isKeyPressed("attack")){
-           
-       }
-       
        if(this.vel.x !== 0){
          //   if(!this.renderable.isCurrentAnimation("run")){
          //       this.renderable.setCurrentAnimation("run");
          //       this.renderable.setAnimationFrame();
          //  }
        }
-       else{
+       else if(!this.renderable.isCurrentAnimation("attack")){
            this.renderable.setCurrentAnimation("idle");
+       }
+       
+       if(me.input.isKeyPressed("attack")){
+           if(!this.renderable.isCurrentAnimation("attack")){
+               this.renderable.setCurrentAnimation("attack", "idle");
+               this.renderable.setAnimationFrame();
+           }
        }
        
        if(me.input.isKeyPressed("jump") && !this.jumping && !this.falling){
@@ -51,6 +55,17 @@ game.PlayerEntity = me.ObjectEntity.extend({
        }
        
        var collision = me.game.world.collide(this);
+       
+       if(collision){
+           if(collision.obj.type === me.game.BaseEntity){
+               if(this.renderable.isCurrentAnimation("attack")){
+                   console.log("ouch1");
+                   //me.game.BaseEntity.loseHealth(1);
+                  // base.loseHealth(1);
+                  collision.obj.loseHealth(1);
+               }
+           }
+       }
        
        this.updateMovement();
        this.parent(delta);
@@ -88,21 +103,31 @@ game.BaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       
+       this.health = 5;
        this.collidable = true;
        
        this.renderable.addAnimation("idle", [0]);
        this.renderable.addAnimation("broken", [1]);
+       
+       this.collidable = true;
+       this.type = me.game.BaseEntity;
    },
    
    update: function(){
-       if(me.input.isKeyPressed("jump")){
+       if (this.health <= 0){
            this.broken = true;
        }
        
        if(this.broken && !this.renderable.isCurrentAnimation("broken")){
            this.renderable.setCurrentAnimation("broken");
        }
+      
+       
+   },
+           
+   loseHealth: function(dmg){
+       console.log("ouch");
+       this.health = this.health - dmg;
    }
    
 });
