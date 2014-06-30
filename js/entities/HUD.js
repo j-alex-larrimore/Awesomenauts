@@ -28,11 +28,13 @@ game.HUD.Container = me.ObjectContainer.extend({
                             
                 //me.game.world.addChild(range, 80);
                 //me.game.world.sort();
+                game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
+                game.data.miniplayer = new miniPlayerLocation(10, 10, 5, {})
                 
 		// add our child score object at the top left corner
 		this.addChild(new game.HUD.ScoreItem(5, 5));
-                this.addChild(new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2")));
-                this.addChild(new CanvasEntity(40, 400, 10, {}));
+                this.addChild(game.data.minimap);
+                this.addChild(game.data.miniplayer);
 	}
 });
 

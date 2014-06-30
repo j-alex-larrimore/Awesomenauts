@@ -5,7 +5,11 @@ var game = {
 	// an object where to store game information
 	data : {
 		// score
-		score : 0
+               // minimap: new game.HUD.MiniMap(300, 10, me.loader.getImage("miniMap2")),
+               minimap: "",
+		score : 0,
+                miniplayer: "",
+                player: ""
 	},
 	
 	

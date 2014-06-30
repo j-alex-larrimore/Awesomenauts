@@ -26,15 +26,11 @@ game.PlayerEntity = me.ObjectEntity.extend({
        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
    }, 
            
-   
   
           
     
    update: function(delta){
-       var minimapx = this.pos.x*0.06;
-       var minimapy = this.pos.x*0.06;
-       console.log(minimapx);
-       
+         
        if(me.input.isKeyPressed("right")){
            this.facing = "right";
            this.vel.x += this.accel.x * me.timer.tick;
@@ -81,7 +77,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
            if(collision.obj.type === me.game.BaseEntity){
                var ydif = this.pos.y - collision.obj.pos.y;
                var xdif = this.pos.x - collision.obj.pos.x;
-               console.log(xdif, ydif);
+               //console.log(xdif, ydif);
                if(ydif < -70){
                    this.falling = false;
                    this.vel.y = 0;
@@ -99,12 +95,17 @@ game.PlayerEntity = me.ObjectEntity.extend({
                if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-collision.obj.pos.y)<=30)){
                     if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < collision.obj.pos.x))){
                         this.lastHit = this.now;
-                        console.log(this.pos.x, this.pos.y, collision.obj.pos.x, collision.obj.pos.y);
+                        //console.log(this.pos.x, this.pos.y, collision.obj.pos.x, collision.obj.pos.y);
                         collision.obj.loseHealth(1);
                     }
                }
            }
        }
+       
+       //game.data.minimap.pos.x = 620-(this.pos.x*0.06);
+       //var minimapy = this.pos.x*0.06;
+       //console.log(game.data.minimap.pos.x);
+       
        
        this.updateMovement();
        this.parent(delta);
@@ -182,23 +183,68 @@ game.BaseEntity = me.ObjectEntity.extend({
    
 });
 
-var CanvasEntity = me.SpriteObject.extend({
-   init : function (x, y, r, settings) {       
-       settings.image = document.createElement("canvas");
-       settings.image.width = (r + 2) * 2;
-       settings.image.height = (r + 2) * 2;
-       settings.image.spriteheight = (r + 2) * 2;
-       settings.image.spritewidth = (r + 2) * 2;
+var miniPlayerLocation = me.SpriteObject.extend({
+   init : function (x, y, r, settings) {
+       this.settings2 = settings;
+       this.r = r;
+       this.x = x;
+       this.y = y;
+       this.anchorPoint = new me.Vector2d(0, 0);
+       this.loc = x, y;
+       this.settings2.image = document.createElement("canvas");
+       this.settings2.image.width = (r + 2) * 2;
+       this.settings2.image.height = (r + 2) * 2;
+       this.settings2.image.spriteheight = (r + 2) * 2;
+       this.settings2.image.spritewidth = (r + 2) * 2;
+       
+       this.floating = true;
+       this.z = 30;
+       this.context = this.settings2.image.getContext("2d");
        
        var ctx = settings.image.getContext("2d");
        ctx.fillStyle = "rgba(0, 192, 32, 0.75)";
        ctx.strokeStyle = "blue";
-       ctx.lineWidth = 5;
+       ctx.lineWidth = 2;
        
        ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
        ctx.fill();
        ctx.stroke();
+       this.player = me.game.world.getChildByName("player");
+       //this.startX = this.player.pos.x;
+       //this.startY = this.player.pos.y;
+       this.changeX;
+       this.changeY;
        
-       this.parent(x, y, settings.image, settings.spritewidth, settings.spriteheight);
-   }
+       this.parent(x, y, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
+   },
+           
+   update: function(){
+       
+        this.pos.x = 10;
+        this.pos.y = 400;
+       
+//       this.context.fillStyle = "rgba(0, 192, 32, 0.75)";
+//       this.context.strokeStyle = "blue";
+//       this.context.lineWidth = 2;
+//       
+//       this.context.arc(this.r + 2, this.r + 2, this.r, 0, Math.PI*2);
+//       this.context.fill();
+//       this.context.stroke();
+       
+      // this.changeX = this.startX;
+       //this.changeY = this.startY;
+       
+       //this.x = 400;
+       //this.y = 400;
+       //this.parent(400, 400, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
+       //this.setShape(this.loc, this.r + 2, this.r + 2);
+       //this.addV(this.loc);
+       //this.translate(10, 10);
+       
+   } 
+   
+  /* draw: function(context){
+       
+   }*/
+   
 });
