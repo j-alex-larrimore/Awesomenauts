@@ -209,7 +209,7 @@ var miniPlayerLocation = me.SpriteObject.extend({
        ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
        ctx.fill();
        ctx.stroke();
-       this.player = me.game.world.getChildByName("player");
+       //this.player = me.game.world.getChildByName("player");
        //this.startX = this.player.pos.x;
        //this.startY = this.player.pos.y;
        this.changeX;
@@ -220,9 +220,9 @@ var miniPlayerLocation = me.SpriteObject.extend({
            
    update: function(){
        
-        this.pos.x = 10;
-        this.pos.y = 400;
-       
+        this.pos.x = (10 + (game.data.player.pos.x *0.0611));
+        this.pos.y = (10 + (game.data.player.pos.y *0.06));
+        console.log(this.pos.x + " " + game.data.player.pos.x);
 //       this.context.fillStyle = "rgba(0, 192, 32, 0.75)";
 //       this.context.strokeStyle = "blue";
 //       this.context.lineWidth = 2;
