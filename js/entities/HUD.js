@@ -24,18 +24,37 @@ game.HUD.Container = me.ObjectContainer.extend({
 		this.name = "HUD";
 		
                  //var range = new CanvasEntity(40, 400, 10, {});
-           
-                            
+                this.last = new Date().getTime();
+                this.now = new Date().getTime();
+                this.toggle = true;
+                
+                this.map = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));      
                
                 //game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
-                game.data.miniplayer = new miniPlayerLocation(10, 10, 5, {})
+                game.data.miniplayer = new miniPlayerLocation(10, 10, 5, {});
                 
                 // game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
 		// add our child score object at the top left corner
 		this.addChild(new game.HUD.ScoreItem(5, 5));
                 this.addChild(new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2")));
                 this.addChild(game.data.miniplayer);
-	}
+	},
+                
+//        update: function (){
+//        this.now = new Date().getTime();
+//        
+//        if(me.input.isKeyPressed("toggleMap")){
+//            if (this.toggle === true && (this.now-this.last >= 1000)){
+//                this.last = this.now;
+//                this.toggle = false;
+//                //this.removeChild(this);
+//            }
+//            else if(this.now-this.last >= 1000){
+//                this.last = this.now;
+//                this.toggle = true;
+//            }
+//        }
+//    }
 });
 
 
@@ -84,12 +103,16 @@ game.HUD.ScoreItem = me.Renderable.extend({
 game.HUD.MiniMap = me.SpriteObject.extend({
     
     init: function (x, y, image){
+        this.toggle = true;
         this.parent(x, y, image);
         this.x = x;
         this.y = y;
+        this.z = 10;
         this.floating = true;
         this.anchorPoint = new me.Vector2d(0,0);
-    },
+    }
+            
+    
     
     /*draw : function(context){
 

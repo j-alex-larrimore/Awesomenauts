@@ -53,6 +53,7 @@ var game = {
                 me.input.bindKey(me.input.KEY.LEFT, "left");
                 me.input.bindKey(me.input.KEY.SPACE, "jump");
                 me.input.bindKey(me.input.KEY.A, "attack");
+                me.input.bindKey(me.input.KEY.TAB, "toggleMap");
             
             // Start the game.
 		me.state.change(me.state.PLAY);
