@@ -77,7 +77,6 @@ game.PlayerEntity = me.ObjectEntity.extend({
            if(collision.obj.type === me.game.BaseEntity){
                var ydif = this.pos.y - collision.obj.pos.y;
                var xdif = this.pos.x - collision.obj.pos.x;
-               //console.log(xdif, ydif);
                if(ydif < -70){
                    this.falling = false;
                    this.vel.y = 0;
@@ -95,16 +94,11 @@ game.PlayerEntity = me.ObjectEntity.extend({
                if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-collision.obj.pos.y)<=30)){
                     if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < collision.obj.pos.x))){
                         this.lastHit = this.now;
-                        //console.log(this.pos.x, this.pos.y, collision.obj.pos.x, collision.obj.pos.y);
                         collision.obj.loseHealth(1);
                     }
                }
            }
        }
-       
-       //game.data.minimap.pos.x = 620-(this.pos.x*0.06);
-       //var minimapy = this.pos.x*0.06;
-       //console.log(game.data.minimap.pos.x);
        
        
        this.updateMovement();
@@ -147,7 +141,6 @@ game.BaseEntity = me.ObjectEntity.extend({
        this.collidable = true;
        
        this.cacheBounds = new me.Rect(new me.Vector2d(), 0, 0);
-       //this.cacheBounds = entity.getShape().getBounds(this.cacheBounds).width; need an 
        
        this.renderable.addAnimation("idle", [0]);
        this.renderable.addAnimation("broken", [1]);
@@ -209,9 +202,6 @@ var miniPlayerLocation = me.SpriteObject.extend({
        ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
        ctx.fill();
        ctx.stroke();
-       //this.player = me.game.world.getChildByName("player");
-       //this.startX = this.player.pos.x;
-       //this.startY = this.player.pos.y;
        this.changeX;
        this.changeY;
        
@@ -220,31 +210,8 @@ var miniPlayerLocation = me.SpriteObject.extend({
            
    update: function(){
        
-        this.pos.x = (10 + (game.data.player.pos.x *0.0611));
+        this.pos.x = (10 + (game.data.player.pos.x *0.062));
         this.pos.y = (10 + (game.data.player.pos.y *0.06));
-        console.log(this.pos.x + " " + game.data.player.pos.x);
-//       this.context.fillStyle = "rgba(0, 192, 32, 0.75)";
-//       this.context.strokeStyle = "blue";
-//       this.context.lineWidth = 2;
-//       
-//       this.context.arc(this.r + 2, this.r + 2, this.r, 0, Math.PI*2);
-//       this.context.fill();
-//       this.context.stroke();
-       
-      // this.changeX = this.startX;
-       //this.changeY = this.startY;
-       
-       //this.x = 400;
-       //this.y = 400;
-       //this.parent(400, 400, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
-       //this.setShape(this.loc, this.r + 2, this.r + 2);
-       //this.addV(this.loc);
-       //this.translate(10, 10);
-       
    } 
-   
-  /* draw: function(context){
-       
-   }*/
    
 });

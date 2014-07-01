@@ -26,14 +26,14 @@ game.HUD.Container = me.ObjectContainer.extend({
                  //var range = new CanvasEntity(40, 400, 10, {});
            
                             
-                //me.game.world.addChild(range, 80);
-                //me.game.world.sort();
-                game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
+               
+                //game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
                 game.data.miniplayer = new miniPlayerLocation(10, 10, 5, {})
                 
+                // game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
 		// add our child score object at the top left corner
 		this.addChild(new game.HUD.ScoreItem(5, 5));
-                this.addChild(game.data.minimap);
+                this.addChild(new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2")));
                 this.addChild(game.data.miniplayer);
 	}
 });
@@ -89,7 +89,24 @@ game.HUD.MiniMap = me.SpriteObject.extend({
         this.y = y;
         this.floating = true;
         this.anchorPoint = new me.Vector2d(0,0);
-    }
+    },
+    
+    /*draw : function(context){
+
+        context.save();
+
+//      context.beginPath();
+//
+//      context.arc(10,10,100,0,Math.PI*2,true);
+        context.rect(10, 10, 200, 200);
+
+        context.clip();
+
+        this.parent(context);
+
+        context.restore();
+
+    }*/
     
 });
 

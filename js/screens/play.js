@@ -30,12 +30,9 @@ game.PlayScreen = me.ScreenObject.extend({
         resetPlayer: function(x, y){
                 game.data.player = me.pool.pull("player", x, y, {});
                 //var base = me.pool.pull("base", x, y, {});
-                //var range = new CanvasEntity(40, 400, 10, {});
                 
                 me.game.world.addChild(game.data.player, 4);
                             
-                //me.game.world.addChild(range, 80);
-                //me.game.world.sort();
         }
 });
 

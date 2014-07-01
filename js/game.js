@@ -6,7 +6,7 @@ var game = {
 	data : {
 		// score
                // minimap: new game.HUD.MiniMap(300, 10, me.loader.getImage("miniMap2")),
-               minimap: "",
+              //minimap: "",
 		score : 0,
                 miniplayer: "",
                 player: ""
