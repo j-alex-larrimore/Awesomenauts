@@ -29,10 +29,12 @@ game.PlayScreen = me.ScreenObject.extend({
         
         resetPlayer: function(x, y){
                 game.data.player = me.pool.pull("player", x, y, {});
-                //var base = me.pool.pull("base", x, y, {});
+                game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+                game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
                 
                 me.game.world.addChild(game.data.player, 4);
-                            
+                me.game.world.addChild(game.data.miniplayer, 31);
+                me.game.world.addChild(game.data.minimap, 30);
         }
 });
 

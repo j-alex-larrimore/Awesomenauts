@@ -176,7 +176,7 @@ game.BaseEntity = me.ObjectEntity.extend({
    
 });
 
-var miniPlayerLocation = me.SpriteObject.extend({
+game.miniPlayerLocation = me.SpriteObject.extend({
    init : function (x, y, r, settings) {
        this.settings2 = settings;
        this.r = r;
@@ -214,4 +214,45 @@ var miniPlayerLocation = me.SpriteObject.extend({
         this.pos.y = (10 + (game.data.player.pos.y *0.06));
    } 
    
+});
+
+game.MiniMap = me.ObjectEntity.extend({
+    
+    init: function (x, y, settings){
+        
+       settings.image = "miniMap2";
+       settings.spritewidth = "701";
+       settings.spriteheight = "115";
+       settings.width = 701;
+       settings.height = 115;
+       this.parent(x, y, settings);
+        
+        
+       this.floating = true;
+        this.anchorPoint = new me.Vector2d(0,0);
+        this.last = new Date().getTime();
+        this.now = new Date().getTime();
+    },
+            
+    
+    
+    /*draw : function(context){
+
+        context.save();
+
+//      context.beginPath();
+//
+//      context.arc(10,10,100,0,Math.PI*2,true);
+        context.rect(10, 10, 200, 200);
+
+        context.clip();
+
+        this.parent(context);
+
+        context.restore();
+
+    }*/
+    
+     update: function (){
+    }
 });

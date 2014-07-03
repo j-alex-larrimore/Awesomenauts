@@ -11,7 +11,7 @@
 		<div id="screen"></div>
 
 		<!-- melonJS Library -->
-		<script type="text/javascript" src="lib/melonJS-1.0.1-min.js"></script>
+		<script type="text/javascript" src="lib/melonJS-1.0.1.js"></script>
 
 		<!-- Plugin(s) -->
 		<script type="text/javascript" src="lib/plugins/debugPanel.js"></script>

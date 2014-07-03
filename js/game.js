@@ -5,8 +5,8 @@ var game = {
 	// an object where to store game information
 	data : {
 		// score
-               // minimap: new game.HUD.MiniMap(300, 10, me.loader.getImage("miniMap2")),
-              //minimap: "",
+                //minimap: new game.HUD.MiniMap(300, 10, me.loader.getImage("miniMap2")),
+                minimap: "",
 		score : 0,
                 miniplayer: "",
                 player: ""
@@ -48,6 +48,8 @@ var game = {
                 
                 me.pool.register("player", game.PlayerEntity, true);
                 me.pool.register("base", game.BaseEntity, true);
+                me.pool.register("miniMap", game.MiniMap, true);
+                me.pool.register("miniPlayer", game.miniPlayerLocation, true);
 
                 me.input.bindKey(me.input.KEY.RIGHT, "right");
                 me.input.bindKey(me.input.KEY.LEFT, "left");

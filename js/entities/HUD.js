@@ -22,39 +22,31 @@ game.HUD.Container = me.ObjectContainer.extend({
 
 		// give a name
 		this.name = "HUD";
-		
-                 //var range = new CanvasEntity(40, 400, 10, {});
+                
                 this.last = new Date().getTime();
                 this.now = new Date().getTime();
                 this.toggle = true;
+		
+                 //var range = new CanvasEntity(40, 400, 10, {});
                 
-                this.map = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));      
+                //this.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
+                  
                
                 //game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
-                game.data.miniplayer = new miniPlayerLocation(10, 10, 5, {});
+                //game.data.miniplayer = new miniPlayerLocation(10, 10, 5, {});
                 
-                // game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
+                //game.data.minimap = new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2"));
 		// add our child score object at the top left corner
-		this.addChild(new game.HUD.ScoreItem(5, 5));
-                this.addChild(new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2")));
-                this.addChild(game.data.miniplayer);
-	},
+		this.addChild(new game.HUD.ScoreItem(5, 5)); 
+                //this.addChild(game.data.minimap);
+                //this.addChild(new game.HUD.MiniMap(10, 10, me.loader.getImage("miniMap2")));
+                //this.addChild(this.minimap);
+                //this.addChild(game.data.miniplayer);
+	}
                 
-//        update: function (){
-//        this.now = new Date().getTime();
-//        
-//        if(me.input.isKeyPressed("toggleMap")){
-//            if (this.toggle === true && (this.now-this.last >= 1000)){
-//                this.last = this.now;
-//                this.toggle = false;
-//                //this.removeChild(this);
-//            }
-//            else if(this.now-this.last >= 1000){
-//                this.last = this.now;
-//                this.toggle = true;
-//            }
-//        }
-//    }
+                
+                
+      
 });
 
 
@@ -67,6 +59,10 @@ game.HUD.ScoreItem = me.Renderable.extend({
 	 */
 	init: function(x, y) {
 		
+                this.last = new Date().getTime();
+                this.now = new Date().getTime();
+                this.toggle = true;
+                
 		// call the parent constructor 
 		// (size does not matter here)
 		this.parent(new me.Vector2d(x, y), 10, 10); 
@@ -88,7 +84,31 @@ game.HUD.ScoreItem = me.Renderable.extend({
 			this.score = game.data.score;
 			return true;
 		}
-		return false;
+		
+                
+                this.now = new Date().getTime();
+                            
+        console.log("In update");
+        if(me.input.isKeyPressed("toggleMap")){
+            if (this.toggle === true && (this.now-this.last >= 1000)){       
+                this.last = this.now;
+                this.toggle = false;
+                me.game.world.removeChild(game.data.minimap);
+                me.game.world.removeChild(game.data.miniplayer);
+               
+            }
+            else if(this.toggle === false && this.now-this.last >= 1000){
+                this.last = this.now;
+                this.toggle = true;       
+                game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
+                game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+                me.game.world.addChild(game.data.minimap, 30);
+                me.game.world.addChild(game.data.miniplayer, 31);
+                
+            }
+        }
+        
+            return false;
 	},
 
 	/**
@@ -100,37 +120,7 @@ game.HUD.ScoreItem = me.Renderable.extend({
 
 });
 
-game.HUD.MiniMap = me.SpriteObject.extend({
-    
-    init: function (x, y, image){
-        this.toggle = true;
-        this.parent(x, y, image);
-        this.x = x;
-        this.y = y;
-        this.z = 10;
-        this.floating = true;
-        this.anchorPoint = new me.Vector2d(0,0);
-    }
-            
-    
-    
-    /*draw : function(context){
 
-        context.save();
-
-//      context.beginPath();
-//
-//      context.arc(10,10,100,0,Math.PI*2,true);
-        context.rect(10, 10, 200, 200);
-
-        context.clip();
-
-        this.parent(context);
-
-        context.restore();
-
-    }*/
-    
-});
+  
 
 
