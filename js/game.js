@@ -9,7 +9,9 @@ var game = {
                 minimap: "",
 		score : 0,
                 miniplayer: "",
-                player: ""
+                player: "",
+                creepe: "",
+                creepp: ""
 	},
 	
 	
@@ -47,9 +49,12 @@ var game = {
 		me.state.set(me.state.PLAY, new game.PlayScreen());
                 
                 me.pool.register("player", game.PlayerEntity, true);
-                me.pool.register("base", game.BaseEntity, true);
+                me.pool.register("baseP", game.PlayerBaseEntity, true);
+                me.pool.register("baseE", game.EnemyBaseEntity, true);
                 me.pool.register("miniMap", game.MiniMap, true);
                 me.pool.register("miniPlayer", game.miniPlayerLocation, true);
+                me.pool.register("creepE", game.EnemyCreep, true);
+                me.pool.register("creepP", game.PlayerCreep, true);
 
                 me.input.bindKey(me.input.KEY.RIGHT, "right");
                 me.input.bindKey(me.input.KEY.LEFT, "left");

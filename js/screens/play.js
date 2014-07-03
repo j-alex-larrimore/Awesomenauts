@@ -9,7 +9,7 @@ game.PlayScreen = me.ScreenObject.extend({
                 // reset the score
 		game.data.score = 0;
                 
-                this.resetPlayer(30, 420);
+                this.resetPlayer(2000, 420);
 
 		// add our HUD to the game world
                 

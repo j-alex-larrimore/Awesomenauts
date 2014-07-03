@@ -87,8 +87,13 @@ game.HUD.ScoreItem = me.Renderable.extend({
 		
                 
                 this.now = new Date().getTime();
-                            
-        console.log("In update");
+                console.log(this.now%4000);
+        if(this.now%4000 === 0){
+            console.log("now!");
+            game.data.creepe = me.pool.pull("creepE", 1900, 1670, {});
+            me.game.world.addChild(game.data.creepe, 31);
+        }   
+        
         if(me.input.isKeyPressed("toggleMap")){
             if (this.toggle === true && (this.now-this.last >= 1000)){       
                 this.last = this.now;
@@ -107,6 +112,7 @@ game.HUD.ScoreItem = me.Renderable.extend({
                 
             }
         }
+        
         
             return false;
 	},

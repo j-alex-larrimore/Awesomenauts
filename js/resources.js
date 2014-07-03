@@ -6,9 +6,12 @@ game.resources = [
 	 */
         { name: "background-tiles", type: "image", src: "data/img/background-tiles.png"},
         { name: "meta-tiles", type: "image", src: "data/img/meta-tiles.png"},
-        { name: "player-img", type: "image", src: "data/img/OGA_16x18_charas_poses_Attack sheet1.png" },
+        //{ name: "player-img", type: "image", src: "" },
         { name: "tower", type: "image", src: "data/img/tower_round.svg.png"},
         { name: "miniMap2", type: "image", src: "data/img/miniMap2.png" },
+        { name: "orcSpear", type: "image", src: "data/img/orcSpear.png" },
+        { name: "creep1", type: "image", src: "data/img/gloop.png"},
+        { name: "creep2", type: "image", src: "data/img/brainmonster.png"},
 	/* Atlases 
 	 * @example
 	 * {name: "example_tps", type: "tps", src: "data/img/example_tps.json"},
