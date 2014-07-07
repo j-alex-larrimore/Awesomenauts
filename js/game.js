@@ -47,6 +47,11 @@ var game = {
 	"loaded" : function () {
 		me.state.set(me.state.MENU, new game.TitleScreen());
 		me.state.set(me.state.PLAY, new game.PlayScreen());
+                me.state.set(me.state.PAUSE, new game.PauseScreen());
+                me.state.set(me.state.CHARSELECT, new game.CharSelect());
+                me.state.set(me.state.GAMEOVER, new game.GameOver());
+                me.state.set(me.state.SPENDEXP, new game.SpendExp());
+                me.state.set(me.state.SPENDGOLD, new game.SpendGold());
                 
                 me.pool.register("player", game.PlayerEntity, true);
                 me.pool.register("baseP", game.PlayerBaseEntity, true);
@@ -61,8 +66,9 @@ var game = {
                 me.input.bindKey(me.input.KEY.SPACE, "jump");
                 me.input.bindKey(me.input.KEY.A, "attack");
                 me.input.bindKey(me.input.KEY.TAB, "toggleMap");
+                me.input.bindKey(me.input.KEY.P, "pause");
             
             // Start the game.
-		me.state.change(me.state.PLAY);
+		me.state.change(me.state.MENU);
 	}
 };

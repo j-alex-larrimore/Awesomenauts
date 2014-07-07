@@ -25,6 +25,13 @@
 
 		<script type="text/javascript" src="js/screens/title.js"></script>
 		<script type="text/javascript" src="js/screens/play.js"></script>
+                <script type="text/javascript" src="js/screens/pause.js"></script>
+                <script type="text/javascript" src="js/screens/gameOver.js"></script>
+                <script type="text/javascript" src="js/screens/charSelect.js"></script>
+                <script type="text/javascript" src="js/screens/spendExp.js"></script>
+                <script type="text/javascript" src="js/screens/spendGold.js"></script>
+                
+                <script type="text/javascript" src="js/screens/Menu.js"></script>
 		
 		<!-- Bootstrap & Mobile optimization tricks -->
 		<script type="text/javascript">

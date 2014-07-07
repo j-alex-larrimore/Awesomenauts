@@ -12,6 +12,14 @@ game.resources = [
         { name: "orcSpear", type: "image", src: "data/img/orcSpear.png" },
         { name: "creep1", type: "image", src: "data/img/gloop.png"},
         { name: "creep2", type: "image", src: "data/img/brainmonster.png"},
+        
+        { name: "title", type: "image", src: "data/img/title.png"},
+        { name: "char_select", type: "image", src: "data/img/char_select.png"},
+        { name: "game_over", type: "image", src: "data/img/game_over.png"},
+        { name: "pause", type: "image", src: "data/img/pause.png"},
+        { name: "spend", type: "image", src: "data/img/spend.png"},
+        
+        { name: "32x32_font", type: "image", src: "data/img/32x32_font.png"},
 	/* Atlases 
 	 * @example
 	 * {name: "example_tps", type: "tps", src: "data/img/example_tps.json"},
