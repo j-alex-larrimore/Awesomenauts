@@ -86,11 +86,9 @@ game.HUD.ScoreItem = me.Renderable.extend({
 		
                 
                 this.now = new Date().getTime();
-                console.log((Math.round(this.now/1000)));
                 
                 if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
                         this.lastCreep = this.now;
-                        console.log("now!");
                         game.data.creepe = me.pool.pull("creepE", 1900, 1670, {});
                         me.game.world.addChild(game.data.creepe, 31);
                 }   
@@ -114,6 +112,12 @@ game.HUD.ScoreItem = me.Renderable.extend({
                     }
                 }
         
+                if(me.input.isKeyPressed("pause")){
+                    console.log("Pause!");
+                    me.state.stop(me.state.PLAY);
+                    console.log("Pause!2");
+                    me.state.change(me.state.PAUSE);
+                }
         
             return false;
 	},

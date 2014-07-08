@@ -11,7 +11,7 @@ game.SpendGold = me.ScreenObject.extend({
 	onResetEvent: function() {	
             me.game.world.addChild( new me.SpriteObject (0, 0, me.loader.getImage('spend')), 1);
            // me.input.bindPointer(me.input.mouse.LEFT, "select");
-            
+            console.log("SpendGold");
             
             
 	},
