@@ -12,7 +12,8 @@ var game = {
                 player: "",
                 creepe: "",
                 creepp: "",
-                gamemanager: ""
+                gamemanager: "",
+                pausescreen: ""
 	},
 	
 	
@@ -82,7 +83,6 @@ var game = {
                 me.input.bindKey(me.input.KEY.TAB, "toggleMap");
                 me.input.bindKey(me.input.KEY.P, "pause");
                 me.input.bindKey(me.input.KEY.B, "buy");
-                me.input.bindKey(me.input.KEY.D, "die");
             
             // Start the game.
 		me.state.change(me.state.MENU);

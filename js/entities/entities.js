@@ -11,8 +11,8 @@ game.PlayerEntity = me.ObjectEntity.extend({
        this.lastHit = new Date().getTime();
        this.facing = "right";
        this.type = "PlayerEntity";
-       this.maxHealth = 10;
-       this.health = 10;
+       this.maxHealth = 100;
+       this.health = 100;
        this.team = true;
        
        this.collidable = true;
@@ -27,7 +27,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
    }, 
            
-  
+   loseHealth: function(dmg){
+       console.log("ouch");
+       this.health = this.health - dmg;
+   },
           
     
    update: function(delta){
@@ -110,7 +113,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
                if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-collision.obj.pos.y)<=40)){
                     if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < collision.obj.pos.x))){
                         this.lastHit = this.now;
-                        collision.obj.loseHealth(1);
+                        collision.obj.loseHealth(20);
                     }
                }
            }
@@ -153,7 +156,7 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       this.health = 5;
+       this.health = 100;
        this.collidable = true;
        this.team = false;
        this.alwaysUpdate = true;
@@ -170,6 +173,7 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
    update: function(){
        if (this.health <= 0){
            this.broken = true;
+           me.state.change(me.state.GAMEOVER, false);
        }
        
        if(this.broken && !this.renderable.isCurrentAnimation("broken")){
@@ -183,7 +187,7 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
    },
            
    loseHealth: function(dmg){
-       console.log("ouch");
+       console.log("ouch" + this.health);
        this.health = this.health - dmg;
    },
    
@@ -206,7 +210,7 @@ game.EnemyBaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       this.health = 5;
+       this.health = 100;
        this.collidable = true;
        this.team = false;
        this.alwaysUpdate = true;
@@ -223,6 +227,7 @@ game.EnemyBaseEntity = me.ObjectEntity.extend({
    update: function(){
        if (this.health <= 0){
            this.broken = true;
+           me.state.change(me.state.GAMEOVER, true);
        }
        
        if(this.broken && !this.renderable.isCurrentAnimation("broken")){
@@ -344,13 +349,62 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.now = new Date().getTime();
        this.collidable = true;
        this.alwaysUpdate = true;
+       this.attack = false;
+       this.jumping = false;
+       this.health = 10;
+       
+       this.lastHit = new Date().getTime();
        
        this.setVelocity(3, 20);
        
        this.renderable.addAnimation("idle", [0]);
+       this.renderable.addAnimation("attack", [0]);
+       this.renderable.addAnimation("walk", [3, 4, 5]);
+       
+       this.renderable.setCurrentAnimation("walk");
     },
+            
+   loseHealth: function(dmg){
+       console.log("ouch");
+       this.health = this.health - dmg;
+   },
     
     update: function(){
+        var collision = me.game.world.collide(this);
+        
+        if(collision && collision.obj.type === "PlayerBaseEntity"){
+            this.now = new Date().getTime();
+            console.log("Boing1");
+            this.attack = true;
+            this.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                collision.obj.loseHealth(1);
+            }
+        }
+        else if(collision && collision.obj.type === "PlayerEntity"){
+            this.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            this.attack = true;
+        }
+        else if(collision && collision.obj.type === "PlayerCreep"){
+            this.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            this.attack = false;
+        }
+        else{
+            this.vel.x -= this.accel.x * me.timer.tick;
+            this.attack = false;
+        }
+        
+        if(this.vel.x === 0 && this.attack === false&& !this.jumping && !this.falling){
+                this.jumping = true;
+                this.vel.y -= this.accel.y * me.timer.tick;
+            
+        }
+        
+        this.updateMovement();
     }
 });
 
@@ -366,14 +420,22 @@ game.PlayerCreep = me.ObjectEntity.extend({
        this.now = new Date().getTime();
        this.alwaysUpdate = true;
        this.collidable = true;
+       this.health = 10;
        
        this.setVelocity(3, 20);
        
        this.renderable.addAnimation("idle", [0]);
     },
     
+     loseHealth: function(dmg){
+       console.log("ouch");
+       this.health = this.health - dmg;
+   },
+    
     update: function(){
         
+        this.vel.x += this.accel.x * me.timer.tick;
+        this.updateMovement();
     }
 });
 
@@ -387,6 +449,8 @@ game.GameManager = me.ObjectEntity.extend({
        this.paused = false;
        this.alwaysUpdate = true;
        this.updateWhenPaused = true;
+       this.pausePos = 0, 0;
+       this.screenDrawn = false;
        
        settings.width = 701;
        settings.height = 115;
@@ -394,7 +458,7 @@ game.GameManager = me.ObjectEntity.extend({
        this.parent(x, y, settings);
    },
    
-   update: function(){
+   update: function(delta){
         this.now = new Date().getTime();
                 
                 if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
@@ -426,22 +490,37 @@ game.GameManager = me.ObjectEntity.extend({
                     me.state.change(me.state.SPENDGOLD);
                 }
                 
-                if(me.input.isKeyPressed("die")){
-                    me.state.change(me.state.GAMEOVER, true);
-                }
-                
                 if(me.input.isKeyPressed("pause") && !this.paused && this.now-this.lastPause >= 1000){
                     this.paused = true;
-                    me.game.world.addChild( new me.SpriteObject (0, 0, me.loader.getImage('pause')), 20000);
+                    this.pausePos = me.game.viewport.localToWorld(0, 0);
+                    console.log(this.pausePos.x + " " + this.pausePos.y);
+                    game.data.pausescreen = new me.SpriteObject (this.pausePos.x, this.pausePos.y, me.loader.getImage('pause'));
+                    this.drawPause();
                     this.lastPause = this.now;
-                    me.state.pause(me.state.PLAY);
+                    if(this.screenDrawn){
+                        this.pause();
+                    }
                 }
                 else if(me.input.isKeyPressed("pause") && this.paused && this.now-this.lastPause >= 1000){
                     this.paused = false;
                     me.state.resume(me.state.PLAY);
                     this.lastPause = this.now;
+                    this.screenDrawn = false;
+                    me.game.world.removeChild(game.data.pausescreen);
                 }
-        
+                
+            this.parent(delta);
             return true;
-   }        
+   },    
+           
+    drawPause: function(){
+        console.log("Drawn?");
+        me.game.world.addChild( game.data.pausescreen, 20000);
+        this.screenDrawn = true;
+    },       
+   
+    pause: function(){
+        console.log("pause");
+        me.state.pause(me.state.PLAY);
+    },
 });
