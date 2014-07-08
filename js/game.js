@@ -11,7 +11,8 @@ var game = {
                 miniplayer: "",
                 player: "",
                 creepe: "",
-                creepp: ""
+                creepp: "",
+                gamemanager: ""
 	},
 	
 	
@@ -29,7 +30,13 @@ var game = {
 			me.plugin.register.defer(this, debugPanel, "debug");
 		});
 	}
-
+        me.state.CHARSELECT = 111;
+        me.state.SPENDEXP = 112;
+        me.state.SPENDGOLD = 113;
+                
+        me.sys.pauseOnBlur = false;             ///Need this and the next line to keep the game from unpausing when you switch to other tabs in your browser
+        me.sys.resumeOnFocus = false;
+        
 	// Initialize the audio.
 	me.audio.init("mp3,ogg");
 
@@ -45,14 +52,21 @@ var game = {
 
 	// Run on game resources loaded.
 	"loaded" : function () {
+                //var me.state.PAUSE = me.state.USER + 0;
+                
+                //var CHARSELECT = 111;
+                //var SPENDEXP = 112;
+                //var SPENDGOLD = 113;
+                
 		me.state.set(me.state.MENU, new game.TitleScreen());
 		me.state.set(me.state.PLAY, new game.PlayScreen());
-                me.state.set(me.state.CHARSELECT, new game.CharSelect());
+                me.state.set(me.state.CHARSELECT, new game.CharSelect());                
+                me.state.set(me.state.SPENDGOLD, new game.SpendGold());
                 me.state.set(me.state.GAMEOVER, new game.GameOver());
                 me.state.set(me.state.SPENDEXP, new game.SpendExp());
-                me.state.set(me.state.SPENDGOLD, new game.SpendGold());
-                me.state.set(me.state.PAUSE, new game.PauseScreen());
+               // me.state.set(me.state.PAUSE, new game.PauseScreen());
                 
+                me.pool.register("gameManager", game.GameManager, true);
                 me.pool.register("player", game.PlayerEntity, true);
                 me.pool.register("baseP", game.PlayerBaseEntity, true);
                 me.pool.register("baseE", game.EnemyBaseEntity, true);
@@ -67,6 +81,8 @@ var game = {
                 me.input.bindKey(me.input.KEY.A, "attack");
                 me.input.bindKey(me.input.KEY.TAB, "toggleMap");
                 me.input.bindKey(me.input.KEY.P, "pause");
+                me.input.bindKey(me.input.KEY.B, "buy");
+                me.input.bindKey(me.input.KEY.D, "die");
             
             // Start the game.
 		me.state.change(me.state.MENU);

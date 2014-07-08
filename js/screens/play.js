@@ -13,6 +13,8 @@ game.PlayScreen = me.ScreenObject.extend({
 
 		// add our HUD to the game world
                 
+                
+                
 		this.HUD = new game.HUD.Container();
 		me.game.world.addChild(this.HUD);
                 
@@ -31,7 +33,9 @@ game.PlayScreen = me.ScreenObject.extend({
                 game.data.player = me.pool.pull("player", x, y, {});
                 game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
                 game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
+                game.data.gamemanager = me.pool.pull("gameManager", 0, 0, {});
                 
+                me.game.world.addChild(game.data.gamemanager, 0);
                 me.game.world.addChild(game.data.player, 4);
                 me.game.world.addChild(game.data.miniplayer, 31);
                 me.game.world.addChild(game.data.minimap, 30);

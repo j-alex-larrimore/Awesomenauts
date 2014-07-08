@@ -156,6 +156,7 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
        this.health = 5;
        this.collidable = true;
        this.team = false;
+       this.alwaysUpdate = true;
        
        this.cacheBounds = new me.Rect(new me.Vector2d(), 0, 0);
        
@@ -208,6 +209,7 @@ game.EnemyBaseEntity = me.ObjectEntity.extend({
        this.health = 5;
        this.collidable = true;
        this.team = false;
+       this.alwaysUpdate = true;
        
        this.cacheBounds = new me.Rect(new me.Vector2d(), 0, 0);
        
@@ -341,6 +343,7 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.last = new Date().getTime();
        this.now = new Date().getTime();
        this.collidable = true;
+       this.alwaysUpdate = true;
        
        this.setVelocity(3, 20);
        
@@ -348,7 +351,6 @@ game.EnemyCreep = me.ObjectEntity.extend({
     },
     
     update: function(){
-        
     }
 });
 
@@ -362,6 +364,7 @@ game.PlayerCreep = me.ObjectEntity.extend({
        this.parent(x, y, settings);
        this.last = new Date().getTime();
        this.now = new Date().getTime();
+       this.alwaysUpdate = true;
        this.collidable = true;
        
        this.setVelocity(3, 20);
@@ -372,4 +375,73 @@ game.PlayerCreep = me.ObjectEntity.extend({
     update: function(){
         
     }
+});
+
+game.GameManager = me.ObjectEntity.extend({
+   init: function (x, y, settings){
+       this.last = new Date().getTime();
+       this.lastCreep = new Date().getTime();
+       this.lastPause = new Date().getTime();
+       this.now = new Date().getTime();
+       this.toggle = true;
+       this.paused = false;
+       this.alwaysUpdate = true;
+       this.updateWhenPaused = true;
+       
+       settings.width = 701;
+       settings.height = 115;
+       
+       this.parent(x, y, settings);
+   },
+   
+   update: function(){
+        this.now = new Date().getTime();
+                
+                if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
+                        this.lastCreep = this.now;
+                        game.data.creepe = me.pool.pull("creepE", 1900, 1670, {});
+                        me.game.world.addChild(game.data.creepe, 31);
+                }   
+
+                if(me.input.isKeyPressed("toggleMap")){
+                    if (this.toggle === true && (this.now-this.last >= 1000)){       
+                        this.last = this.now;
+                        this.toggle = false;
+                        me.game.world.removeChild(game.data.minimap);
+                        me.game.world.removeChild(game.data.miniplayer);
+
+                    }
+                    else if(this.toggle === false && this.now-this.last >= 1000){
+                        this.last = this.now;
+                        this.toggle = true;       
+                        game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
+                        game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+                        me.game.world.addChild(game.data.minimap, 30);
+                        me.game.world.addChild(game.data.miniplayer, 31);
+
+                    }
+                }
+                
+                if(me.input.isKeyPressed("buy")){
+                    me.state.change(me.state.SPENDGOLD);
+                }
+                
+                if(me.input.isKeyPressed("die")){
+                    me.state.change(me.state.GAMEOVER, true);
+                }
+                
+                if(me.input.isKeyPressed("pause") && !this.paused && this.now-this.lastPause >= 1000){
+                    this.paused = true;
+                    me.game.world.addChild( new me.SpriteObject (0, 0, me.loader.getImage('pause')), 20000);
+                    this.lastPause = this.now;
+                    me.state.pause(me.state.PLAY);
+                }
+                else if(me.input.isKeyPressed("pause") && this.paused && this.now-this.lastPause >= 1000){
+                    this.paused = false;
+                    me.state.resume(me.state.PLAY);
+                    this.lastPause = this.now;
+                }
+        
+            return true;
+   }        
 });

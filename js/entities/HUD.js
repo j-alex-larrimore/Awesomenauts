@@ -56,11 +56,7 @@ game.HUD.ScoreItem = me.Renderable.extend({
 	 * constructor
 	 */
 	init: function(x, y) {
-		
-                this.last = new Date().getTime();
-                this.lastCreep = new Date().getTime();
-                this.now = new Date().getTime();
-                this.toggle = true;
+
                 
 		// call the parent constructor 
 		// (size does not matter here)
@@ -84,40 +80,7 @@ game.HUD.ScoreItem = me.Renderable.extend({
 			return true;
 		}
 		
-                
-                this.now = new Date().getTime();
-                
-                if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
-                        this.lastCreep = this.now;
-                        game.data.creepe = me.pool.pull("creepE", 1900, 1670, {});
-                        me.game.world.addChild(game.data.creepe, 31);
-                }   
-
-                if(me.input.isKeyPressed("toggleMap")){
-                    if (this.toggle === true && (this.now-this.last >= 1000)){       
-                        this.last = this.now;
-                        this.toggle = false;
-                        me.game.world.removeChild(game.data.minimap);
-                        me.game.world.removeChild(game.data.miniplayer);
-
-                    }
-                    else if(this.toggle === false && this.now-this.last >= 1000){
-                        this.last = this.now;
-                        this.toggle = true;       
-                        game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
-                        game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
-                        me.game.world.addChild(game.data.minimap, 30);
-                        me.game.world.addChild(game.data.miniplayer, 31);
-
-                    }
-                }
-        
-                if(me.input.isKeyPressed("pause")){
-                    console.log("Pause!");
-                    me.state.stop(me.state.PLAY);
-                    console.log("Pause!2");
-                    me.state.change(me.state.PAUSE);
-                }
+          
         
             return false;
 	},
@@ -127,7 +90,11 @@ game.HUD.ScoreItem = me.Renderable.extend({
 	 */
 	draw : function (context) {
 		// draw it baby !
-	}
+	},
+        
+        onPause: function(){
+            console.log("onPause");
+        }
 
 });
 
