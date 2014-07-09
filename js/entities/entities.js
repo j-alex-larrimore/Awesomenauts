@@ -352,6 +352,7 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.attack = false;
        this.jumping = false;
        this.health = 10;
+       this.type = "EnemyCreep";
        
        this.lastHit = new Date().getTime();
        
@@ -370,35 +371,44 @@ game.EnemyCreep = me.ObjectEntity.extend({
    },
     
     update: function(){
-        var collision = me.game.world.collide(this);
-        
-        if(collision && collision.obj.type === "PlayerBaseEntity"){
-            this.now = new Date().getTime();
-            console.log("Boing1");
-            this.attack = true;
-            this.vel.x = 0;
-            this.pos.x = this.pos.x + 1;
-            if((this.now-this.lastHit >= 1000)){
-                this.lastHit = this.now;
-                collision.obj.loseHealth(1);
+        var collision = me.game.world.collide(this, true);
+        if(collision.length >0){
+            for(var i = 0; i< collision.length; i++){
+                if(collision[i].obj.type === "PlayerBaseEntity"){
+                        this.now = new Date().getTime();
+                        this.attack = true;
+                        this.vel.x = 0;
+                        this.pos.x = this.pos.x + 1;
+                    if((this.now-this.lastHit >= 1000)){
+                        this.lastHit = this.now;
+                        collision[i].obj.loseHealth(1);
+                    }
+                }
+                else if(collision[i].obj.type === "PlayerEntity"){
+                    console.log("Player");
+                    this.vel.x = 0;
+                    this.pos.x = this.pos.x + 1;
+                    this.attack = true;
+                }
+                else if(collision[i].obj.type === "PlayerCreep"){
+                    console.log("PCreep");
+                    this.vel.x = 0;
+                    this.pos.x = this.pos.x + 1;
+                    this.attack = true;
+                }
+                else{
+                    this.vel.x -= this.accel.x * me.timer.tick;
+                    this.attack = false;
+                }
             }
-        }
-        else if(collision && collision.obj.type === "PlayerEntity"){
-            this.vel.x = 0;
-            this.pos.x = this.pos.x + 1;
-            this.attack = true;
-        }
-        else if(collision && collision.obj.type === "PlayerCreep"){
-            this.vel.x = 0;
-            this.pos.x = this.pos.x + 1;
-            this.attack = false;
         }
         else{
             this.vel.x -= this.accel.x * me.timer.tick;
             this.attack = false;
         }
-        
+      
         if(this.vel.x === 0 && this.attack === false&& !this.jumping && !this.falling){
+                //console.log("stuck");
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
             
@@ -421,6 +431,7 @@ game.PlayerCreep = me.ObjectEntity.extend({
        this.alwaysUpdate = true;
        this.collidable = true;
        this.health = 10;
+       this.type = "PlayerCreep";
        
        this.setVelocity(3, 20);
        
@@ -439,7 +450,7 @@ game.PlayerCreep = me.ObjectEntity.extend({
     }
 });
 
-game.GameManager = me.ObjectEntity.extend({
+game.GameManager = Object.extend({
    init: function (x, y, settings){
        this.last = new Date().getTime();
        this.lastCreep = new Date().getTime();
@@ -455,16 +466,15 @@ game.GameManager = me.ObjectEntity.extend({
        settings.width = 701;
        settings.height = 115;
        
-       this.parent(x, y, settings);
    },
    
-   update: function(delta){
+   update: function(){
         this.now = new Date().getTime();
                 
                 if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
                         this.lastCreep = this.now;
                         game.data.creepe = me.pool.pull("creepE", 1900, 1670, {});
-                        me.game.world.addChild(game.data.creepe, 31);
+                        me.game.world.addChild(game.data.creepe, 5);
                 }   
 
                 if(me.input.isKeyPressed("toggleMap")){
@@ -492,35 +502,36 @@ game.GameManager = me.ObjectEntity.extend({
                 
                 if(me.input.isKeyPressed("pause") && !this.paused && this.now-this.lastPause >= 1000){
                     this.paused = true;
-                    this.pausePos = me.game.viewport.localToWorld(0, 0);
-                    console.log(this.pausePos.x + " " + this.pausePos.y);
-                    game.data.pausescreen = new me.SpriteObject (this.pausePos.x, this.pausePos.y, me.loader.getImage('pause'));
-                    this.drawPause();
+                    //this.pausePos = me.game.viewport.localToWorld(0, 0);
+                    game.data.pausePos = me.game.viewport.localToWorld(0, 0);
+                    game.data.pausescreen = new me.SpriteObject (game.data.pausePos.x, game.data.pausePos.y, me.loader.getImage('pause'));
+                    game.data.pausescreen.updateWhenPaused = true;
+                    //me.game.world.addChild(game.data.pausescreen, 32);
                     this.lastPause = this.now;
-                    if(this.screenDrawn){
-                        this.pause();
-                    }
+                    game.data.pauseText = new (me.Renderable.extend ({
+                        init: function(){
+                            this.parent(new me.Vector2d((game.data.pausePos.x + 270), (game.data.pausePos.x + 100)), 510, 30);
+                            this.font = new me.BitmapFont("32x32_font", 32);
+                            this.updateWhenPaused = true;
+                        },
+
+                        draw: function(context){
+                            this.font.draw(context, "PRESS 'P' TO UNPAUSE", (game.data.pausePos.x + 270), (game.data.pausePos.x + 100));
+                        }
+
+                    }));
+                    me.game.world.addChild(game.data.pauseText, 35);
+                    me.state.pause(me.state.PLAY);
                 }
                 else if(me.input.isKeyPressed("pause") && this.paused && this.now-this.lastPause >= 1000){
                     this.paused = false;
                     me.state.resume(me.state.PLAY);
                     this.lastPause = this.now;
                     this.screenDrawn = false;
-                    me.game.world.removeChild(game.data.pausescreen);
+                    //me.game.world.removeChild(game.data.pausescreen);
+                    me.game.world.removeChild(game.data.pauseText);
                 }
-                
-            this.parent(delta);
-            return true;
+                return true;
    },    
-           
-    drawPause: function(){
-        console.log("Drawn?");
-        me.game.world.addChild( game.data.pausescreen, 20000);
-        this.screenDrawn = true;
-    },       
-   
-    pause: function(){
-        console.log("pause");
-        me.state.pause(me.state.PLAY);
-    },
+     
 });

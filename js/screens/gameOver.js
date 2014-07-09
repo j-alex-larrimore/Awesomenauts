@@ -23,9 +23,9 @@ game.GameOver = me.ScreenObject.extend({
                     //this.font.draw(context, "PRESS ENTER TO START A NEW GAME", 20, 240);
                     //this.font.draw(context, "PRESS 'L' TO LOAD YOUR PROFILE", 20, 340);
                     if(!win)
-                        this.font.draw(context, "YOU LOSE. TRY AGAIN?", 270, 100);
+                        this.font.draw(context, "YOU LOSE. TRY AGAIN?", 210, 100);
                     else
-                        this.font.draw(context, "BRILLIANT! REMATCH?", 270, 100);
+                        this.font.draw(context, "BRILLIANT! REMATCH?", 220, 100);
                 }
                 
             })));

@@ -13,7 +13,9 @@ var game = {
                 creepe: "",
                 creepp: "",
                 gamemanager: "",
-                pausescreen: ""
+                pausescreen: "",
+                pausePos: "",
+                pauseText: ""
 	},
 	
 	
