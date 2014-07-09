@@ -22,7 +22,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
        this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
        this.renderable.setCurrentAnimation("idle");
        
-       this.setVelocity(20, 50);
+       this.setVelocity(20, 20);
        
        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
    }, 
@@ -35,6 +35,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
    update: function(delta){
          //console.log(this.pos.x + " " + this.pos.y);
          //console.log("now!");
+       if (this.health <= 0){
+           //me.state.change(me.state.GAMEOVER, false);
+       }
+         
        if(me.input.isKeyPressed("right")){
            this.facing = "right";
            this.vel.x += this.accel.x * me.timer.tick;
@@ -74,47 +78,58 @@ game.PlayerEntity = me.ObjectEntity.extend({
             this.vel.y -= this.accel.y * me.timer.tick;
        }
        
-       var collision = me.game.world.collide(this);
+       //var collision = me.game.world.collide(this);
+        var bcollision = me.game.world.collideType(this, "EnemyBaseEntity");
+        var pcollision = me.game.world.collideType(this, "EnemyEntity");
+        var ccollision = me.game.world.collideType(this, "EnemyCreep");
+        this.now = new Date().getTime();
        
-       if(collision){
-           this.now = new Date().getTime();
-           if(collision.obj.type === "EnemyBaseEntity"){
-               var ydif = this.pos.y - collision.obj.pos.y;
-               var xdif = this.pos.x - collision.obj.pos.x;
-               if(ydif < -55 && (xdif < 60) && (xdif > -35)){
-                   this.falling = false;
-                   this.vel.y = 0;
-                   this.pos.y = this.pos.y - 1;
-               }
-              else if((xdif > 0)&&(xdif < 60)&&(ydif > -55)){
+        if(bcollision){
+            var ydif = this.pos.y - bcollision.obj.pos.y;
+            var xdif = this.pos.x - bcollision.obj.pos.x;
+            if(ydif < -55 && (xdif < 60) && (xdif > -35)){
+                this.falling = false;
+                this.vel.y = 0;
+                this.pos.y = this.pos.y - 1;
+            }
+            else if((xdif > 0)&&(xdif < 60)&&(ydif > -55)){
                 this.vel.x = 0;
                 this.pos.x = this.pos.x + 1;
-               }
-               else if((xdif > -35) && (xdif < 0) &&(ydif > -55)){
-                   this.vel.x = 0;
-                   this.pos.x = this.pos.x - 1;
-               }
-               
-//               if(ydif < -70){
-//                   this.falling = false;
-//                   this.vel.y = 0;
-//                   this.pos.y = this.pos.y - 1;
-//               }
-//              else if((xdif > 0)&&(ydif > -70)){
-//                this.vel.x = 0;
-//                this.pos.x = this.pos.x + 1;
-//               }
-//               else if((xdif < 0)&&(ydif > -70)){
-//                   this.vel.x = 0;
-//                   this.pos.x = this.pos.x - 1;
-//               }
-                
-               if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-collision.obj.pos.y)<=40)){
-                    if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < collision.obj.pos.x))){
-                        this.lastHit = this.now;
-                        collision.obj.loseHealth(20);
-                    }
-               }
+            }
+            else if((xdif > -35) && (xdif < 0) &&(ydif > -55)){
+                this.vel.x = 0;
+                this.pos.x = this.pos.x - 1;
+            }
+        
+            if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-bcollision.obj.pos.y)<=40)){
+                if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < bcollision.obj.pos.x))){
+                    this.lastHit = this.now;
+                    bcollision.obj.loseHealth(20);
+                }
+            }
+       }
+       
+       if(pcollision){
+           
+       }
+       
+       if(ccollision){
+           var ydif = this.pos.y - ccollision.obj.pos.y;
+           var xdif = this.pos.x - ccollision.obj.pos.x;
+           if(xdif > 0){
+               this.vel.x = 0;
+               this.pos.x = this.pos.x + 1;
+           }
+           else{
+               this.vel.x = 0;
+               this.pos.x = this.pos.x - 1;
+           }
+           
+           if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 1000 && (Math.abs(this.pos.y-ccollision.obj.pos.y)<=40)){
+                if((this.facing === "left" && (this.pos.x > ccollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < ccollision.obj.pos.x))){
+                    this.lastHit = this.now;
+                    ccollision.obj.loseHealth(10);
+                }
            }
        }
        
@@ -392,6 +407,8 @@ game.EnemyCreep = me.ObjectEntity.extend({
             }
         }
         else if(pcollision){
+             var ydif = this.pos.y - pcollision.obj.pos.y;
+             var xdif = this.pos.x - pcollision.obj.pos.x;
              this.vel.x = 0;
              this.pos.x = this.pos.x + 1;
              this.attack = true; 
@@ -485,6 +502,8 @@ game.PlayerCreep = me.ObjectEntity.extend({
             }
         }
         else if(pcollision){
+            var ydif = this.pos.y - pcollision.obj.pos.y;
+            var xdif = this.pos.x - pcollision.obj.pos.x;
              this.vel.x = 0;
              this.pos.x = this.pos.x - 1;
              this.attack = true; 
