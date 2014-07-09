@@ -589,15 +589,19 @@ game.GameManager = Object.extend({
                     game.data.pausescreen.updateWhenPaused = true;
                     me.game.world.addChild(game.data.pausescreen, 32);
                     this.lastPause = this.now;
+                    console.log((game.data.pausePos.x) + " 1 " + (game.data.pausePos.y));
                     game.data.pauseText = new (me.Renderable.extend ({
                         init: function(){
-                            this.parent(new me.Vector2d((game.data.pausePos.x + 270), (game.data.pausePos.x + 100)), 510, 30);
+                            this.parent(new me.Vector2d(game.data.pausePos.x, game.data.pausePos.y), 1, 1);
                             this.font = new me.BitmapFont("32x32_font", 32);
                             this.updateWhenPaused = true;
+                            this.alwaysUpdate = true;
+                            console.log((game.data.pausePos.x) + " 2 " + (game.data.pausePos.y));
                         },
 
-                        draw: function(context){
-                            this.font.draw(context, "PRESS 'P' TO UNPAUSE", (game.data.pausePos.x + 270), (game.data.pausePos.x + 100));
+                        draw: function(context){    
+                            console.log((game.data.pausePos.x) + " 3 " + (game.data.pausePos.y ));
+                            this.font.draw(context, "PRESS 'P' TO UNPAUSE", (game.data.pausePos.x + 270), (game.data.pausePos.y + 100));
                         }
 
                     }));
