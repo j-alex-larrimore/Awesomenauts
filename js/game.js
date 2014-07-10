@@ -8,6 +8,7 @@ var game = {
                 //minimap: new game.HUD.MiniMap(300, 10, me.loader.getImage("miniMap2")),
                 username: "",       //username, password, exp are the variables being saved/loaded
                 password: "",
+                character: "",        
                 exp: "",
                 gold: "",
                 minimap: "",

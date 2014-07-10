@@ -12,9 +12,17 @@ game.resources = [
         { name: "orcSpear", type: "image", src: "data/img/orcSpear.png" },
         { name: "archer", type: "image", src: "data/img/archer.png" },
         { name: "darkelf", type: "image", src: "data/img/darkelf.png" },
-        { name: "skeletonDagger", type: "image", src: "data/img/skeletonDagger.png" },
+        //{ name: "skeletonDagger", type: "image", src: "data/img/skeletonDagger.png" },
         { name: "skeletonBigSword", type: "image", src: "data/img/skeletonBigSword.png" },
         { name: "wizard", type: "image", src: "data/img/wizard.png" },
+        
+        { name: "archerIcon", type: "image", src: "data/img/archerIcon.png" },
+        { name: "orcSpearIcon", type: "image", src: "data/img/orcSpearIcon.png" },
+        { name: "darkelfIcon", type: "image", src: "data/img/darkelfIcon.png" },
+        //{ name: "skeletonDaggerIcon", type: "image", src: "data/img/skeletonDaggerIcon.png" },
+        { name: "skeletonBigSwordIcon", type: "image", src: "data/img/skeletonBigSwordIcon.png" },
+        { name: "wizardIcon", type: "image", src: "data/img/wizardIcon.png" },
+        
         { name: "creep1", type: "image", src: "data/img/gloop.png"},
         { name: "creep2", type: "image", src: "data/img/brainmonster.png"},
         

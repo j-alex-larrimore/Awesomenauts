@@ -25,14 +25,13 @@ game.TitleScreen = me.ScreenObject.extend({
                 },
                 
                 newGame: function(x){
-                    me.state.change(me.state.PLAY);
                     me.input.releasePointerEvent('pointerdown', this);
+                    me.state.change(me.state.CHARSELECT);
                 }
                 
             })));
             
            me.game.world.addChild(new (me.Renderable.extend ({
-                
                 
                 init: function(){
                     this.parent(new me.Vector2d(350, 340), 350, 30);
@@ -51,10 +50,9 @@ game.TitleScreen = me.ScreenObject.extend({
                 },
                 
                 newGame: function(x){
+                    me.input.releasePointerEvent('pointerdown', this);
                     me.state.change(me.state.PLAY);
                     //me.state.change(me.state.LOADPROFILE);
-                    me.input.releasePointerEvent('pointerdown', this);
-                    
                 }
                 
             })));     

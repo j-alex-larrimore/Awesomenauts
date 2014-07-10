@@ -1,28 +1,89 @@
 game.PlayerEntity = me.ObjectEntity.extend({
    init: function (x, y, settings){
-       settings.image = "orcSpear";
        settings.spritewidth = "64";
        settings.spriteheight = "64";
        settings.width = 64;
        settings.height = 64;
-       this.parent(x, y, settings);
+       
+       if(game.data.character === 1){           
+           console.log("archer");
+           settings.image = "archer";
+           this.parent(x, y, settings);
+           this.maxHealth = 1;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(20, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(game.data.character === 2){
+           console.log("darkelf");
+           settings.image = "darkelf";
+           this.parent(x, y, settings);
+           this.maxHealth = 1;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(20, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(game.data.character === 3){
+           console.log("orc");
+           settings.image = "orcSpear";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(20, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(game.data.character === 4){
+           console.log("wizard");
+           settings.image = "wizard";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(20, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(game.data.character === 5){
+           console.log("skeleton");
+           settings.image = "skeletonBigSword";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(20, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else{
+           console.log("Character select ERROR");
+       }
+       
+       this.deathtimer = new Date().getTime();
        this.last = new Date().getTime();
        this.now = new Date().getTime();
        this.lastHit = new Date().getTime();
        this.facing = "right";
        this.type = "PlayerEntity";
-       this.maxHealth = 100;
-       this.health = 100;
        this.team = true;
-       
+       this.dead = false;
+       this.health = this.maxHealth;
        this.collidable = true;
-       
-       this.renderable.addAnimation("idle", [78]);
-       this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
-       this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
-       this.renderable.setCurrentAnimation("idle");
-       
-       this.setVelocity(20, 20);
        
        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
    }, 
@@ -33,9 +94,27 @@ game.PlayerEntity = me.ObjectEntity.extend({
           
     
    update: function(delta){
-         //console.log(this.pos.x + " " + this.pos.y);
-         //console.log("now!");
+           this.now = new Date().getTime();
+         
        if (this.health <= 0){
+           if(this.dead === false){
+                this.deathtimer = new Date().getTime();
+                this.renderable.setCurrentAnimation("die");
+                //this.renderable.setCurrentAnimation("die");
+                this.renderable.setAnimationFrame();
+                this.dead = true;
+           }
+           else if(this.now - this.deathtimer > 480){
+               this.renderable.setCurrentAnimation("idle");
+               this.pos.x = 10;
+               this.pos.y = 150;
+               this.health = this.maxHealth;
+               this.dead = false;
+           }
+           else{
+           }
+           
+           
            //me.state.change(me.state.GAMEOVER, false);
        }
          
@@ -60,12 +139,11 @@ game.PlayerEntity = me.ObjectEntity.extend({
                 this.renderable.setAnimationFrame();
            }
        }
-       else if(!this.renderable.isCurrentAnimation("attack")){
+       else if(!this.renderable.isCurrentAnimation("attack") && !this.renderable.isCurrentAnimation("die")){
            this.renderable.setCurrentAnimation("idle");
        }
        
        if(me.input.isKeyPressed("attack")){
-           this.now = new Date().getTime();
            if(!this.renderable.isCurrentAnimation("attack") && (this.now-this.last >= 1000)){
                this.last = this.now;
                this.renderable.setCurrentAnimation("attack", "idle");
@@ -201,7 +279,6 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
    },
            
    loseHealth: function(dmg){
-       //console.log("ouch" + this.health);
        this.health = this.health - dmg;
    },
    
@@ -255,7 +332,6 @@ game.EnemyBaseEntity = me.ObjectEntity.extend({
    },
            
    loseHealth: function(dmg){
-       //console.log("ouch" + this.health);
        this.health = this.health - dmg;
    },
    
@@ -343,7 +419,6 @@ game.miniPCreepLocation = me.SpriteObject.extend({
    },
            
    updateMini: function(x, y){
-       //console.log(x + " " + y);
         this.pos.x = (10 + (x * 0.062));
         this.pos.y = (10 + (y * 0.06));
        
@@ -477,7 +552,6 @@ game.EnemyCreep = me.ObjectEntity.extend({
     },
             
    loseHealth: function(dmg){
-       //console.log("ouch");
        this.health = this.health - dmg;
    },
     
@@ -495,7 +569,6 @@ game.EnemyCreep = me.ObjectEntity.extend({
         var ccollision = me.game.world.collideType(this, "PlayerCreep");
         
         if(bcollision){
-            console.log(bcollision.obj.type);
             this.attack = true;
             this.vel.x = 0;
             this.pos.x = this.pos.x + 1;
@@ -536,7 +609,6 @@ game.EnemyCreep = me.ObjectEntity.extend({
         }        
 
         if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
-                console.log("stuck" + this.attack);
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
                 //this.vel.x -= this.accel.x * me.timer.tick;
