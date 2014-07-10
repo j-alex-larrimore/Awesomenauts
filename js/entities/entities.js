@@ -102,7 +102,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
             }
         
             if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-bcollision.obj.pos.y)<=40)){
-                if((this.facing === "left" && (this.pos.x > collision.obj.pos.x))||(this.facing === "right" && (this.pos.x < bcollision.obj.pos.x))){
+                if((this.facing === "left" && (this.pos.x > bcollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < bcollision.obj.pos.x))){
                     this.lastHit = this.now;
                     bcollision.obj.loseHealth(20);
                 }
@@ -310,6 +310,99 @@ game.miniPlayerLocation = me.SpriteObject.extend({
    
 });
 
+game.miniPCreepLocation = me.SpriteObject.extend({
+   init : function (x, y, r, settings) {
+       this.settings2 = settings;
+       this.r = r;
+       this.x = x;
+       this.y = y;
+       this.anchorPoint = new me.Vector2d(0, 0);
+       this.loc = x, y;
+       this.settings2.image = document.createElement("canvas");
+       this.settings2.image.width = (r + 2) * 2;
+       this.settings2.image.height = (r + 2) * 2;
+       this.settings2.image.spriteheight = (r + 2) * 2;
+       this.settings2.image.spritewidth = (r + 2) * 2;
+       
+       this.floating = true;
+       this.z = 30;
+       this.context = this.settings2.image.getContext("2d");
+       
+       var ctx = settings.image.getContext("2d");
+       ctx.fillStyle = "rgba(0, 192, 32, 0.75)";
+       ctx.strokeStyle = "blue";
+       ctx.lineWidth = 1;
+       
+       ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
+       ctx.fill();
+       ctx.stroke();
+       this.changeX;
+       this.changeY;
+       
+       this.parent(x, y, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
+   },
+           
+   updateMini: function(x, y){
+       //console.log(x + " " + y);
+        this.pos.x = (10 + (x * 0.062));
+        this.pos.y = (10 + (y * 0.06));
+       
+//        this.pos.x = (10 + (game.data.player.pos.x *0.062));
+//        this.pos.y = (10 + (game.data.player.pos.y *0.06));
+        
+        return true;
+   } 
+   
+});
+
+game.miniECreepLocation = me.SpriteObject.extend({
+   init : function (x, y, r, settings) {
+       this.settings2 = settings;
+       this.r = r;
+       this.x = x;
+       this.y = y;
+       this.anchorPoint = new me.Vector2d(0, 0);
+       this.loc = x, y;
+       this.settings2.image = document.createElement("canvas");
+       this.settings2.image.width = (r + 2) * 2;
+       this.settings2.image.height = (r + 2) * 2;
+       this.settings2.image.spriteheight = (r + 2) * 2;
+       this.settings2.image.spritewidth = (r + 2) * 2;
+       
+       this.floating = true;
+       this.z = 30;
+       this.context = this.settings2.image.getContext("2d");
+       
+       var ctx = settings.image.getContext("2d");
+       ctx.fillStyle = "red";
+       ctx.strokeStyle = "yellow";
+       ctx.lineWidth = 1;
+       
+       ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
+       ctx.fill();
+       ctx.stroke();
+       this.changeX;
+       this.changeY;
+       
+       this.parent(x, y, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
+   },
+           
+   updateMini: function(x, y){
+       
+       this.pos.x = (10 + (x * 0.062));
+       this.pos.y = (10 + (y * 0.06));
+       
+//        this.pos.x = (10 + (game.data.player.pos.x *0.062));
+//        this.pos.y = (10 + (game.data.player.pos.y *0.06));
+        
+        return true;
+   } 
+   
+});
+
+
+
+
 game.MiniMap = me.ObjectEntity.extend({
     
     init: function (x, y, settings){
@@ -373,6 +466,9 @@ game.EnemyCreep = me.ObjectEntity.extend({
        
        this.setVelocity(7, 20);
        
+       this.mini = new game.miniECreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       me.game.world.addChild(this.mini, 31);
+       
        this.renderable.addAnimation("idle", [0]);
        this.renderable.addAnimation("attack", [0]);
        this.renderable.addAnimation("walk", [3, 4, 5]);
@@ -387,8 +483,10 @@ game.EnemyCreep = me.ObjectEntity.extend({
     
    update: function(delta){
        this.now = new Date().getTime();
+       this.mini.updateMini(this.pos.x, this.pos.y);
        
         if (this.health <= 0){
+           me.game.world.removeChild(this.mini); 
            me.game.world.removeChild(this);
         }
         
@@ -409,13 +507,20 @@ game.EnemyCreep = me.ObjectEntity.extend({
         else if(pcollision){
              var ydif = this.pos.y - pcollision.obj.pos.y;
              var xdif = this.pos.x - pcollision.obj.pos.x;
-             this.vel.x = 0;
-             this.pos.x = this.pos.x + 1;
+             this.vel.x = 0;             
              this.attack = true; 
-             if((this.now-this.lastHit >= 1000)){
+             if((this.now-this.lastHit >= 1000) && !pcollision.obj.renderable.isCurrentAnimation("attack")){
                 this.lastHit = this.now;
                 pcollision.obj.loseHealth(1);
              }
+             
+             if(xdif > 0){
+                 this.pos.x = this.pos.x + 1;
+             }
+             else{
+                 this.pos.x = this.pos.x - 1;
+             }
+                 
         }
         else if(ccollision){
             this.vel.x = 0;
@@ -464,6 +569,9 @@ game.PlayerCreep = me.ObjectEntity.extend({
        
        this.setVelocity(3, 20);
        
+       this.mini = new game.miniPCreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       me.game.world.addChild(this.mini, 31);
+       
        this.flipX(true);
        this.renderable.addAnimation("idle", [0]);
        this.renderable.addAnimation("move", [0, 1, 2, 3, 4]);
@@ -478,8 +586,10 @@ game.PlayerCreep = me.ObjectEntity.extend({
     
     update: function(delta){
        this.now = new Date().getTime();
+       this.mini.updateMini(this.pos.x, this.pos.y);
        
         if (this.health <= 0){
+           me.game.world.removeChild(this.mini); 
            me.game.world.removeChild(this);
         }
         
@@ -488,7 +598,6 @@ game.PlayerCreep = me.ObjectEntity.extend({
         var ccollision = me.game.world.collideType(this, "EnemyCreep");
         
         if(bcollision){
-            console.log(bcollision.obj.type);
             this.attack = true;
             this.vel.x = 0;
             this.pos.x = this.pos.x - 1;
@@ -534,7 +643,6 @@ game.PlayerCreep = me.ObjectEntity.extend({
         }        
 
         if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
-                console.log("stuck" + this.attack);
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
                 //this.vel.x -= this.accel.x * me.timer.tick;

@@ -47,31 +47,18 @@ game.TitleScreen = me.ScreenObject.extend({
                 draw: function(context){
                     //this.font.draw(context, "PRESS ENTER TO START A NEW GAME", 20, 240);
                     //this.font.draw(context, "PRESS 'L' TO LOAD YOUR PROFILE", 20, 340);
-                    this.font.draw(context, "LOAD A GAME", 350, 340);
+                    this.font.draw(context, "CONTINUE", 380, 340);
                 },
                 
                 newGame: function(x){
                     me.state.change(me.state.PLAY);
+                    //me.state.change(me.state.LOADPROFILE);
                     me.input.releasePointerEvent('pointerdown', this);
                     
                 }
                 
             })));     
-            
-//            me.input.bindKey(me.input.KEY.ENTER, "enter", true);
-//            me.input.bindKey(me.input.KEY.L, "L", true);
-//            console.log("Keys bound");
-            
-//            this.handler = me.event.subscribe(me.event.KEYDOWN, function (action, keyCode, edge) {
-//            if (action === "enter") {
-//                console.log("New Game");
-//               // me.state.change(me.state.PLAY);
-//            }
-//            else if (action === "L"){
-//                console.log("Load");
-//            }
-//        });
-            
+
 
             
 	},

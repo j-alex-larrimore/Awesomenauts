@@ -30,8 +30,12 @@
                 <script type="text/javascript" src="js/screens/charSelect.js"></script>
                 <script type="text/javascript" src="js/screens/spendExp.js"></script>
                 <script type="text/javascript" src="js/screens/spendGold.js"></script>
+                <script type="text/javascript" src="js/screens/newProfile.js"></script>
+                <script type="text/javascript" src="js/screens/loadProfile.js"></script>
                 
                 <script type="text/javascript" src="js/screens/Menu.js"></script>
+                
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		
 		<!-- Bootstrap & Mobile optimization tricks -->
 		<script type="text/javascript">

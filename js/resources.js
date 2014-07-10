@@ -10,6 +10,11 @@ game.resources = [
         { name: "tower", type: "image", src: "data/img/tower_round.svg.png"},
         { name: "miniMap2", type: "image", src: "data/img/miniMap2.png" },
         { name: "orcSpear", type: "image", src: "data/img/orcSpear.png" },
+        { name: "archer", type: "image", src: "data/img/archer.png" },
+        { name: "darkelf", type: "image", src: "data/img/darkelf.png" },
+        { name: "skeletonDagger", type: "image", src: "data/img/skeletonDagger.png" },
+        { name: "skeletonBigSword", type: "image", src: "data/img/skeletonBigSword.png" },
+        { name: "wizard", type: "image", src: "data/img/wizard.png" },
         { name: "creep1", type: "image", src: "data/img/gloop.png"},
         { name: "creep2", type: "image", src: "data/img/brainmonster.png"},
         
@@ -18,6 +23,8 @@ game.resources = [
         { name: "game_over", type: "image", src: "data/img/game_over.png"},
         { name: "pause", type: "image", src: "data/img/pause.png"},
         { name: "spend", type: "image", src: "data/img/spend.png"},
+        { name: "load", type: "image", src: "data/img/loadpic.png"},
+        { name: "new", type: "image", src: "data/img/newpic.png"},
         
         { name: "32x32_font", type: "image", src: "data/img/32x32_font.png"},
 	/* Atlases 

@@ -31,3 +31,12 @@ body {
 	image-rendering: optimize-contrast;
 	-ms-interpolation-mode: nearest-neighbor;
 }
+
+#screen {
+    position: relative;
+}
+
+#screen input {
+    position: absolute;
+    z-index: 100;
+}

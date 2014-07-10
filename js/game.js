@@ -6,6 +6,10 @@ var game = {
 	data : {
 		// score
                 //minimap: new game.HUD.MiniMap(300, 10, me.loader.getImage("miniMap2")),
+                username: "",       //username, password, exp are the variables being saved/loaded
+                password: "",
+                exp: "",
+                gold: "",
                 minimap: "",
 		score : 0,
                 miniplayer: "",
@@ -36,6 +40,8 @@ var game = {
         me.state.CHARSELECT = 111;
         me.state.SPENDEXP = 112;
         me.state.SPENDGOLD = 113;
+        me.state.NEWPROFILE = 114;
+        me.state.LOADPROFILE = 115;
                 
         me.sys.pauseOnBlur = false;             ///Need this and the next line to keep the game from unpausing when you switch to other tabs in your browser
         me.sys.resumeOnFocus = false;
@@ -67,6 +73,8 @@ var game = {
                 me.state.set(me.state.SPENDGOLD, new game.SpendGold());
                 me.state.set(me.state.GAMEOVER, new game.GameOver());
                 me.state.set(me.state.SPENDEXP, new game.SpendExp());
+                me.state.set(me.state.NEWPROFILE, new game.NewProfile());
+                me.state.set(me.state.LOADPROFILE, new game.LoadProfile());
                // me.state.set(me.state.PAUSE, new game.PauseScreen());
                 
                 me.pool.register("gameManager", game.GameManager, true);
