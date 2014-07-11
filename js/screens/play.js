@@ -13,6 +13,13 @@ game.PlayScreen = me.ScreenObject.extend({
 
 		// add our HUD to the game world
                 
+                if(me.save.exp != null){
+                    console.log("Loading exp = " + me.save.exp);
+                    game.data.exp = me.save.exp;
+                }
+                else{
+                    console.log("no save data");
+                }
                 
                 
 		this.HUD = new game.HUD.Container();
@@ -34,7 +41,17 @@ game.PlayScreen = me.ScreenObject.extend({
                 game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
                 game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
                 game.data.gamemanager = me.pool.pull("gameManager", 0, 0, {});
+                game.data.teammate1 = me.pool.pull("playerTeammate", 10, 150, {});
+                game.data.teammate2 = me.pool.pull("playerTeammate", 10, 150, {});
+                game.data.enemy1 = me.pool.pull("enemyEntity", 11000, 150, {});
+                game.data.enemy2 = me.pool.pull("enemyEntity", 11000, 150, {});
+                game.data.enemy3 = me.pool.pull("enemyEntity", 11000, 150, {});
                 
+                me.game.world.addChild(game.data.enemy1, 4);
+                me.game.world.addChild(game.data.enemy2, 4);
+                me.game.world.addChild(game.data.enemy3, 4);
+                me.game.world.addChild(game.data.teammate1, 4);
+                me.game.world.addChild(game.data.teammate2, 4);
                 me.game.world.addChild(game.data.gamemanager, 0);
                 me.game.world.addChild(game.data.player, 4);
                 me.game.world.addChild(game.data.miniplayer, 31);

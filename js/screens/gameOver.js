@@ -12,6 +12,15 @@ game.GameOver = me.ScreenObject.extend({
             console.log("Win? " + win); 
             me.game.world.addChild( new me.SpriteObject (0, 0, me.loader.getImage('game_over')), -10);
            // me.input.bindPointer(me.input.mouse.LEFT, "select");
+           if(win){
+               game.data.exp = game.data.exp + 10;
+           }
+           else{
+               game.data.exp = game.data.exp + 1;
+           }
+           console.log(game.data.exp);
+           me.save.exp = game.data.exp;
+           console.log(me.save.exp);
            
             me.game.world.addChild(new (me.Renderable.extend ({
                 init: function(){
@@ -51,7 +60,7 @@ game.GameOver = me.ScreenObject.extend({
                 
                 newGame: function(x){
                     console.log("New Game");
-                    me.state.change(me.state.PLAY);
+                    me.state.change(me.state.CHARSELECT);
                     me.input.releasePointerEvent('pointerdown', this);
                 }
                 
@@ -73,12 +82,12 @@ game.GameOver = me.ScreenObject.extend({
                 draw: function(context){
                     //this.font.draw(context, "PRESS ENTER TO START A NEW GAME", 20, 240);
                     //this.font.draw(context, "PRESS 'L' TO LOAD YOUR PROFILE", 20, 340);
-                    this.font.draw(context, "LOAD A GAME", 350, 340);
+                    this.font.draw(context, "CONTINUE", 350, 340);
                 },
                 
                 newGame: function(x){
                     console.log("Load");
-                    me.state.change(me.state.PLAY);
+                    me.state.change(me.state.CHARSELECT);
                     me.input.releasePointerEvent('pointerdown', this);
                     
                 }

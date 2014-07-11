@@ -78,11 +78,12 @@ game.PlayerEntity = me.ObjectEntity.extend({
        this.last = new Date().getTime();
        this.now = new Date().getTime();
        this.lastHit = new Date().getTime();
+       this.dead = false;
+       this.health = this.maxHealth;
        this.facing = "right";
        this.type = "PlayerEntity";
        this.team = true;
-       this.dead = false;
-       this.health = this.maxHealth;
+       
        this.collidable = true;
        
        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
@@ -100,7 +101,6 @@ game.PlayerEntity = me.ObjectEntity.extend({
            if(this.dead === false){
                 this.deathtimer = new Date().getTime();
                 this.renderable.setCurrentAnimation("die");
-                //this.renderable.setCurrentAnimation("die");
                 this.renderable.setAnimationFrame();
                 this.dead = true;
            }
@@ -144,7 +144,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
        }
        
        if(me.input.isKeyPressed("attack")){
-           if(!this.renderable.isCurrentAnimation("attack") && (this.now-this.last >= 1000)){
+           if(!this.renderable.isCurrentAnimation("attack") && !this.renderable.isCurrentAnimation("die") && (this.now-this.last >= 1000)){
                this.last = this.now;
                this.renderable.setCurrentAnimation("attack", "idle");
                this.renderable.setAnimationFrame();
@@ -386,6 +386,90 @@ game.miniPlayerLocation = me.SpriteObject.extend({
    
 });
 
+game.miniEnemyLocation = me.SpriteObject.extend({
+   init : function (x, y, r, settings) {
+       this.settings2 = settings;
+       this.r = r;
+       this.x = x;
+       this.y = y;
+       this.anchorPoint = new me.Vector2d(0, 0);
+       this.loc = x, y;
+       this.settings2.image = document.createElement("canvas");
+       this.settings2.image.width = (r + 2) * 2;
+       this.settings2.image.height = (r + 2) * 2;
+       this.settings2.image.spriteheight = (r + 2) * 2;
+       this.settings2.image.spritewidth = (r + 2) * 2;
+       
+       this.floating = true;
+       this.z = 30;
+       this.context = this.settings2.image.getContext("2d");
+       
+       var ctx = settings.image.getContext("2d");
+       ctx.fillStyle = "red";
+       ctx.strokeStyle = "yellow";
+       ctx.lineWidth = 2;
+       
+       ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
+       ctx.fill();
+       ctx.stroke();
+       this.changeX;
+       this.changeY;
+       
+       this.parent(x, y, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
+   },
+           
+   updateMini: function(x, y){
+       
+        this.pos.x = (10 + (x * 0.062));
+        this.pos.y = (10 + (y * 0.06));
+        
+        return true;
+   } 
+   
+});
+
+game.miniTeammateLocation = me.SpriteObject.extend({
+   init : function (x, y, r, settings) {
+       this.settings2 = settings;
+       this.r = r;
+       this.x = x;
+       this.y = y;
+       this.anchorPoint = new me.Vector2d(0, 0);
+       this.loc = x, y;
+       this.settings2.image = document.createElement("canvas");
+       this.settings2.image.width = (r + 2) * 2;
+       this.settings2.image.height = (r + 2) * 2;
+       this.settings2.image.spriteheight = (r + 2) * 2;
+       this.settings2.image.spritewidth = (r + 2) * 2;
+       
+       this.floating = true;
+       this.z = 30;
+       this.context = this.settings2.image.getContext("2d");
+       
+       var ctx = settings.image.getContext("2d");
+       ctx.fillStyle = "green";
+       ctx.strokeStyle = "blue";
+       ctx.lineWidth = 2;
+       
+       ctx.arc(r + 2, r + 2, r, 0, Math.PI*2);
+       ctx.fill();
+       ctx.stroke();
+       this.changeX;
+       this.changeY;
+       
+       this.parent(x, y, this.settings2.image, this.settings2.spritewidth, this.settings2.spriteheight);
+   },
+           
+   updateMini: function(x, y){
+       
+        this.pos.x = (10 + (x * 0.062));
+        this.pos.y = (10 + (y * 0.06));
+        
+        return true;
+   } 
+   
+});
+
 game.miniPCreepLocation = me.SpriteObject.extend({
    init : function (x, y, r, settings) {
        this.settings2 = settings;
@@ -405,7 +489,7 @@ game.miniPCreepLocation = me.SpriteObject.extend({
        this.context = this.settings2.image.getContext("2d");
        
        var ctx = settings.image.getContext("2d");
-       ctx.fillStyle = "rgba(0, 192, 32, 0.75)";
+       ctx.fillStyle = "green";
        ctx.strokeStyle = "blue";
        ctx.lineWidth = 1;
        
@@ -541,7 +625,8 @@ game.EnemyCreep = me.ObjectEntity.extend({
        
        this.setVelocity(7, 20);
        
-       this.mini = new game.miniECreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       //this.mini = new game.miniECreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       this.mini = me.pool.pull("miniECreep", 10, 10, 3, {});
        me.game.world.addChild(this.mini, 31);
        
        this.renderable.addAnimation("idle", [0]);
@@ -567,6 +652,7 @@ game.EnemyCreep = me.ObjectEntity.extend({
         var bcollision = me.game.world.collideType(this, "PlayerBaseEntity");
         var pcollision = me.game.world.collideType(this, "PlayerEntity");
         var ccollision = me.game.world.collideType(this, "PlayerCreep");
+        var tcollision = me.game.world.collideType(this, "PlayerTeammate");
         
         if(bcollision){
             this.attack = true;
@@ -585,6 +671,24 @@ game.EnemyCreep = me.ObjectEntity.extend({
              if((this.now-this.lastHit >= 1000) && !pcollision.obj.renderable.isCurrentAnimation("attack")){
                 this.lastHit = this.now;
                 pcollision.obj.loseHealth(1);
+             }
+             
+             if(xdif > 0){
+                 this.pos.x = this.pos.x + 1;
+             }
+             else{
+                 this.pos.x = this.pos.x - 1;
+             }
+                 
+        }
+        else if(tcollision){
+             var ydif = this.pos.y - tcollision.obj.pos.y;
+             var xdif = this.pos.x - tcollision.obj.pos.x;
+             this.vel.x = 0;             
+             this.attack = true; 
+             if((this.now-this.lastHit >= 1000) && !tcollision.obj.renderable.isCurrentAnimation("attack")){
+                this.lastHit = this.now;
+                tcollision.obj.loseHealth(1);
              }
              
              if(xdif > 0){
@@ -641,7 +745,8 @@ game.PlayerCreep = me.ObjectEntity.extend({
        
        this.setVelocity(3, 20);
        
-       this.mini = new game.miniPCreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       //this.mini = new game.miniPCreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       this.mini = me.pool.pull("miniPCreep", 10, 10, 3, {});
        me.game.world.addChild(this.mini, 31);
        
        this.flipX(true);
@@ -675,7 +780,7 @@ game.PlayerCreep = me.ObjectEntity.extend({
             this.pos.x = this.pos.x - 1;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
-                bcollision.obj.loseHealth(1);
+                bcollision.obj.loseHealth(this.attack);
                 if(!this.renderable.isCurrentAnimation("attack")){
                     this.renderable.setCurrentAnimation("attack", "move");
                     this.renderable.setAnimationFrame();
@@ -683,18 +788,20 @@ game.PlayerCreep = me.ObjectEntity.extend({
             }
         }
         else if(pcollision){
-            var ydif = this.pos.y - pcollision.obj.pos.y;
-            var xdif = this.pos.x - pcollision.obj.pos.x;
-             this.vel.x = 0;
-             this.pos.x = this.pos.x - 1;
+             var ydif = this.pos.y - pcollision.obj.pos.y;
+             var xdif = this.pos.x - pcollision.obj.pos.x;
+             this.vel.x = 0;             
              this.attack = true; 
-             if((this.now-this.lastHit >= 1000)){
+             if((this.now-this.lastHit >= 1000) && !pcollision.obj.renderable.isCurrentAnimation("attack")){
                 this.lastHit = this.now;
-                pcollision.obj.loseHealth(1);
-                if(!this.renderable.isCurrentAnimation("attack")){
-                    this.renderable.setCurrentAnimation("attack", "move");
-                    this.renderable.setAnimationFrame();
-                }
+                pcollision.obj.loseHealth(this.attack);
+             }
+             
+             if(xdif > 0){
+                 this.pos.x = this.pos.x + 1;
+             }
+             else{
+                 this.pos.x = this.pos.x - 1;
              }
         }
         else if(ccollision){
@@ -703,7 +810,7 @@ game.PlayerCreep = me.ObjectEntity.extend({
             this.attack = true;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
-                ccollision.obj.loseHealth(1);
+                ccollision.obj.loseHealth(this.attack);
                 if(!this.renderable.isCurrentAnimation("attack")){
                     this.renderable.setCurrentAnimation("attack", "move");
                     this.renderable.setAnimationFrame();
@@ -727,6 +834,410 @@ game.PlayerCreep = me.ObjectEntity.extend({
         return true;
     }
 });
+
+game.EnemyEntity = me.ObjectEntity.extend({
+    init: function(x, y, settings){
+       settings.spritewidth = "64";
+       settings.spriteheight = "64";
+       settings.width = 64;
+       settings.height = 64;
+       var char = Math.floor(Math.random()* 5)+1;
+       
+       
+       if(char === 1){           
+           console.log("archer");
+           settings.image = "archer";
+           this.parent(x, y, settings);
+           this.maxHealth = 1;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(4, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 2){
+           console.log("darkelf");
+           settings.image = "darkelf";
+           this.parent(x, y, settings);
+           this.maxHealth = 1;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(5, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 3){
+           console.log("orc");
+           settings.image = "orcSpear";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(6, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 4){
+           console.log("wizard");
+           settings.image = "wizard";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(3, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 5){
+           console.log("skeleton");
+           settings.image = "skeletonBigSword";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(2, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else{
+           console.log("Character select ERROR");
+       }
+       
+       this.renderable.setCurrentAnimation("run");
+       this.deathtimer = new Date().getTime();
+       this.last = new Date().getTime();
+       this.now = new Date().getTime();
+       this.lastHit = new Date().getTime();
+       this.dead = false;
+       this.health = this.maxHealth;
+       this.type = "EnemyEntity";
+       this.alwaysUpdate = true;
+       this.collidable = true;
+       this.lastPosX = this.pos.x;
+       
+       //this.mini = new game.miniEnemyLocation(10, 10, 5, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       this.mini = me.pool.pull("miniEnemy", 10, 10, 5, {});
+       me.game.world.addChild(this.mini, 31);
+       
+       //this.flipX(true);
+    },
+    
+     loseHealth: function(dmg){
+       this.health = this.health - dmg;
+   },
+    
+    update: function(delta){
+       this.now = new Date().getTime();
+       this.mini.updateMini(this.pos.x, this.pos.y);
+       
+        if (this.health <= 0){
+            if(this.dead === false){
+                this.deathtimer = new Date().getTime();
+                this.renderable.setCurrentAnimation("die");
+                this.renderable.setAnimationFrame();
+                this.dead = true;
+           }
+           else if(this.now - this.deathtimer > 480){
+               this.renderable.setCurrentAnimation("run");
+               this.pos.x = 10;
+               this.pos.y = 150;
+               this.health = this.maxHealth;
+               this.dead = false;
+           }
+           else{
+           }
+           
+           
+            
+//           me.game.world.removeChild(this.mini); 
+//           me.game.world.removeChild(this);
+        }
+        
+        var bcollision = me.game.world.collideType(this, "PlayerBaseEntity");
+        var pcollision = me.game.world.collideType(this, "PlayerEntity");
+        var ccollision = me.game.world.collideType(this, "PlayerCreep");
+        var tcollision = me.game.world.collideType(this, "PlayerTeammate");
+        
+        if(bcollision){
+            this.attack = true;
+            this.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                bcollision.obj.loseHealth(this.attack);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
+            }
+        }
+        else if(pcollision){
+            var ydif = this.pos.y - pcollision.obj.pos.y;
+            var xdif = this.pos.x - pcollision.obj.pos.x;
+             this.vel.x = 0;
+             this.pos.x = this.pos.x - 1;
+             this.attack = true; 
+             if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                pcollision.obj.loseHealth(this.attack);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
+             }
+        }
+        else if(tcollision){
+             var ydif = this.pos.y - tcollision.obj.pos.y;
+             var xdif = this.pos.x - tcollision.obj.pos.x;
+             this.vel.x = 0;             
+             this.attack = true; 
+             if((this.now-this.lastHit >= 1000) && !tcollision.obj.renderable.isCurrentAnimation("attack")){
+                this.lastHit = this.now;
+                tcollision.obj.loseHealth(this.attack);
+             }
+             
+             if(xdif > 0){
+                 this.pos.x = this.pos.x + 1;
+             }
+             else{
+                 this.pos.x = this.pos.x - 1;
+             }
+                 
+        }
+        else if(ccollision){
+            this.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            this.attack = true;
+            if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                ccollision.obj.loseHealth(this.attack);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
+             }
+        }
+        else{
+            this.vel.x -= this.accel.x * me.timer.tick;
+        }        
+
+        if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
+                this.jumping = true;
+                this.vel.y -= this.accel.y * me.timer.tick;
+                //this.vel.x -= this.accel.x * me.timer.tick;
+            
+        }
+        this.attack = false;
+        this.lastPosX = this.pos.x;
+        this.parent(delta);
+        this.updateMovement();
+        return true;
+    }
+});
+
+game.PlayerTeammate = me.ObjectEntity.extend({
+    init: function(x, y, settings){
+       settings.spritewidth = "64";
+       settings.spriteheight = "64";
+       settings.width = 64;
+       settings.height = 64;
+       var char = Math.floor(Math.random()* 5)+1;
+       
+       
+       if(char === 1){           
+           console.log("archer");
+           settings.image = "archer";
+           this.parent(x, y, settings);
+           this.maxHealth = 1;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(4, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 2){
+           console.log("darkelf");
+           settings.image = "darkelf";
+           this.parent(x, y, settings);
+           this.maxHealth = 1;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(5, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 3){
+           console.log("orc");
+           settings.image = "orcSpear";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(6, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 4){
+           console.log("wizard");
+           settings.image = "wizard";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(3, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else if(char === 5){
+           console.log("skeleton");
+           settings.image = "skeletonBigSword";
+           this.parent(x, y, settings);
+           this.maxHealth = 100;
+           this.attack = 20;
+           this.defense = 0;
+           this.setVelocity(2, 20);
+           this.renderable.addAnimation("idle", [78]);
+           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
+           this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
+           this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
+       }
+       else{
+           console.log("Character select ERROR");
+       }
+       
+       this.renderable.setCurrentAnimation("run");
+       this.deathtimer = new Date().getTime();
+       this.last = new Date().getTime();
+       this.now = new Date().getTime();
+       this.lastHit = new Date().getTime();
+       this.dead = false;
+       this.health = this.maxHealth;
+       this.type = "PlayerTeammate";
+       this.alwaysUpdate = true;
+       this.collidable = true;
+       this.lastPosX = this.pos.x;
+       
+       //this.mini = new game.miniTeammateLocation(10, 10, 5, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
+       this.mini = me.pool.pull("miniTeammate", 10, 10, 5, {});
+       me.game.world.addChild(this.mini, 31);
+       
+       this.flipX(true);
+    },
+    
+     loseHealth: function(dmg){
+        
+       this.health = this.health - dmg;
+       
+   },
+    
+    update: function(delta){
+       this.now = new Date().getTime();
+       this.mini.updateMini(this.pos.x, this.pos.y);
+       
+        if (this.health <= 0){
+           if(this.dead === false){
+                this.deathtimer = new Date().getTime();
+                this.renderable.setCurrentAnimation("die");
+                this.renderable.setAnimationFrame();
+                this.dead = true;
+           }
+           else if(this.now - this.deathtimer > 480){
+               this.renderable.setCurrentAnimation("run");
+               this.pos.x = 10;
+               this.pos.y = 150;
+               this.health = this.maxHealth;
+               this.dead = false;
+           }
+           else{
+           }
+           
+            
+            
+           //me.game.world.removeChild(this.mini); 
+           //me.game.world.removeChild(this);
+        }
+        
+        var bcollision = me.game.world.collideType(this, "EnemyBaseEntity");
+        var pcollision = me.game.world.collideType(this, "EnemyEntity");
+        var ccollision = me.game.world.collideType(this, "EnemyCreep");
+        
+        if(bcollision){
+            this.attack = true;
+            this.vel.x = 0;
+            this.pos.x = this.pos.x - 1;
+            if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                bcollision.obj.loseHealth(1);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
+            }
+        }
+        else if(pcollision){
+            var ydif = this.pos.y - pcollision.obj.pos.y;
+            var xdif = this.pos.x - pcollision.obj.pos.x;
+             this.vel.x = 0;
+             this.pos.x = this.pos.x - 1;
+             this.attack = true; 
+             if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                pcollision.obj.loseHealth(1);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
+             }
+        }
+        else if(ccollision){
+            this.vel.x = 0;
+            this.pos.x = this.pos.x - 1;
+            this.attack = true;
+            if((this.now-this.lastHit >= 1000)){
+                this.lastHit = this.now;
+                ccollision.obj.loseHealth(1);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
+             }
+        }
+        else{
+            this.vel.x += this.accel.x * me.timer.tick;
+        }        
+
+        if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
+                this.jumping = true;
+                this.vel.y -= this.accel.y * me.timer.tick;
+                //this.vel.x -= this.accel.x * me.timer.tick;
+            
+        }
+        this.attack = false;
+        this.lastPosX = this.pos.x;
+        this.parent(delta);
+        this.updateMovement();
+        return true;
+    }
+});
+
 
 game.GameManager = Object.extend({
    init: function (x, y, settings){

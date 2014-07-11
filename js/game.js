@@ -9,8 +9,8 @@ var game = {
                 username: "",       //username, password, exp are the variables being saved/loaded
                 password: "",
                 character: "",        
-                exp: "",
-                gold: "",
+                exp: 0,
+                gold: 0,
                 minimap: "",
 		score : 0,
                 miniplayer: "",
@@ -20,9 +20,15 @@ var game = {
                 gamemanager: "",
                 pausescreen: "",
                 pausePos: "",
-                pauseText: ""
+                pauseText: "",
+                teammate1: "",
+                teammate2: "",
+                enemy1: "",
+                enemy2: "",
+                enemy3: ""
 	},
 	
+        
 	
 	// Run on page load.
 	"onload" : function () {
@@ -30,7 +36,9 @@ var game = {
 	if (!me.video.init("screen", 1067, 600, true, 1.0)) {
 		alert("Your browser does not support HTML5 canvas.");
 		return;
-	}
+	}        
+        
+        me.save.add({exp : 0});
 
 	// add "#debug" to the URL to enable the debug Panel
 	if (document.location.hash === "#debug") {
@@ -86,6 +94,12 @@ var game = {
                 me.pool.register("miniPlayer", game.miniPlayerLocation, true);
                 me.pool.register("creepE", game.EnemyCreep, true);
                 me.pool.register("creepP", game.PlayerCreep, true);
+                me.pool.register("enemyEntity", game.EnemyEntity, true);
+                me.pool.register("playerTeammate", game.PlayerTeammate, true);
+                me.pool.register("miniPCreep", game.miniPCreepLocation, true);
+                me.pool.register("miniECreep", game.miniECreepLocation, true);
+                me.pool.register("miniEnemy", game.miniEnemyLocation, true);
+                me.pool.register("miniTeammate", game.miniTeammateLocation, true);
 
                 me.input.bindKey(me.input.KEY.RIGHT, "right");
                 me.input.bindKey(me.input.KEY.LEFT, "left");

@@ -39,27 +39,22 @@ game.CharSelect = me.ScreenObject.extend({
                 this.handler = me.event.subscribe(me.event.KEYDOWN, function (action, keyCode, edge) {
                 if (action === "F1") {
                     game.data.character = 1;
-                    console.log("F1"+ " " + game.data.character);
                     me.state.change(me.state.PLAY);
                 }
                 else if(action === "F2"){
                     game.data.character = 2;
-                    console.log("F2"+ " " + game.data.character);
                     me.state.change(me.state.PLAY);
                 }
                 else if(action === "F3"){
                     game.data.character = 3;
-                    console.log("F3"+ " " + game.data.character);
                     me.state.change(me.state.PLAY);
                 }  
                 else if(action === "F4"){
                     game.data.character = 4;
-                    console.log("F4"+ " " + game.data.character);
                     me.state.change(me.state.PLAY);
                 }  
                 else if(action === "F5"){
                     game.data.character = 5;
-                    console.log("F5"+ " " + game.data.character);
                     me.state.change(me.state.PLAY);
                 }  
                 });
