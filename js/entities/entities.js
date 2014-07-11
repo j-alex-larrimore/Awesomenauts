@@ -207,6 +207,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 1000 && (Math.abs(this.pos.y-pcollision.obj.pos.y)<=40)){
                 if((this.facing === "left" && (this.pos.x > pcollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < pcollision.obj.pos.x))){
                     this.lastHit = this.now;
+                    if(pcollision.obj.health < this.attack){
+                        game.data.gold += 10;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                     pcollision.obj.loseHealth(this.attack);
                 }
            }
@@ -231,6 +235,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 1000 && (Math.abs(this.pos.y-ccollision.obj.pos.y)<=40)){
                 if((this.facing === "left" && (this.pos.x > ccollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < ccollision.obj.pos.x))){
                     this.lastHit = this.now;
+                    if(pcollision.obj.health < this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                     ccollision.obj.loseHealth(this.attack);
                 }
            }
@@ -1283,12 +1291,14 @@ game.GameManager = Object.extend({
        this.lastCreep = new Date().getTime();
        this.lastPause = new Date().getTime();
        this.now = new Date().getTime();
+       this.lastBuy = this.now;
        this.toggle = true;
        this.paused = false;
+       this.buying = false;
        this.alwaysUpdate = true;
        this.updateWhenPaused = true;
        this.pausePos = 0, 0;
-       this.screenDrawn = false;
+       //this.screenDrawn = false;
        
        settings.width = 701;
        settings.height = 115;
@@ -1299,6 +1309,8 @@ game.GameManager = Object.extend({
         this.now = new Date().getTime();
                 
                 if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
                         this.lastCreep = this.now;
                         game.data.creepe = me.pool.pull("creepE", 11000, 0, {});
                         game.data.creepp = me.pool.pull("creepP", 0, 0, {});
@@ -1321,12 +1333,41 @@ game.GameManager = Object.extend({
                         game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
                         me.game.world.addChild(game.data.minimap, 30);
                         me.game.world.addChild(game.data.miniplayer, 31);
-
+                            
                     }
                 }
                 
-                if(me.input.isKeyPressed("buy")){
-                    me.state.change(me.state.SPENDGOLD);
+                if(me.input.isKeyPressed("buy") && !this.buying && this.now-this.lastBuy >= 1000){
+                    console.log("this.buy? " + this.buying);
+                    this.buying = true;
+                    this.lastBuy = this.now;
+                    game.data.pausePos = me.game.viewport.localToWorld(0, 0);
+                    game.data.buyscreen = new me.SpriteObject (game.data.pausePos.x, game.data.pausePos.y, me.loader.getImage('spend'));
+                    game.data.buyscreen.updateWhenPaused = true;
+                    game.data.buyscreen.setOpacity(0.8);
+                    me.game.world.addChild(game.data.buyscreen, 34);
+                    game.data.player.setVelocity(0, 0);             //NEED TO ADD A GLOBAL VARIABLE HERE
+                    game.data.buytext = new (me.Renderable.extend ({
+                        init: function(){
+                            this.parent(new me.Vector2d(game.data.pausePos.x, game.data.pausePos.y), 1, 1);
+                            this.font = new me.BitmapFont("32x32_font", 32);
+                            this.updateWhenPaused = true;
+                            this.alwaysUpdate = true;
+                        },
+
+                        draw: function(context){    
+                            this.font.draw(context, "CHOOSE WISELY", (game.data.pausePos.x + 270), (game.data.pausePos.y + 10));
+                        }
+
+                    }));
+                    me.game.world.addChild(game.data.buytext, 35);  
+                }
+                 else if(me.input.isKeyPressed("buy") && this.buying && this.now-this.lastBuy >= 1000){
+                    this.buying = false;
+                    this.lastBuy = this.now;
+                    game.data.player.setVelocity(20, 20);             //NEED TO ADD A GLOBAL VARIABLE HERE
+                    me.game.world.removeChild(game.data.buyscreen);
+                    me.game.world.removeChild(game.data.buytext);
                 }
                 
                 if(me.input.isKeyPressed("pause") && !this.paused && this.now-this.lastPause >= 1000){
@@ -1337,30 +1378,26 @@ game.GameManager = Object.extend({
                     game.data.pausescreen.updateWhenPaused = true;
                     me.game.world.addChild(game.data.pausescreen, 32);
                     this.lastPause = this.now;
-                    console.log((game.data.pausePos.x) + " 1 " + (game.data.pausePos.y));
                     game.data.pauseText = new (me.Renderable.extend ({
                         init: function(){
                             this.parent(new me.Vector2d(game.data.pausePos.x, game.data.pausePos.y), 1, 1);
                             this.font = new me.BitmapFont("32x32_font", 32);
                             this.updateWhenPaused = true;
                             this.alwaysUpdate = true;
-                            console.log((game.data.pausePos.x) + " 2 " + (game.data.pausePos.y));
                         },
 
                         draw: function(context){    
-                            console.log((game.data.pausePos.x) + " 3 " + (game.data.pausePos.y ));
                             this.font.draw(context, "PRESS 'P' TO UNPAUSE", (game.data.pausePos.x + 270), (game.data.pausePos.y + 100));
                         }
 
                     }));
-                    me.game.world.addChild(game.data.pauseText, 35);
+                    me.game.world.addChild(game.data.pauseText, 33);
                     me.state.pause(me.state.PLAY);
                 }
                 else if(me.input.isKeyPressed("pause") && this.paused && this.now-this.lastPause >= 1000){
                     this.paused = false;
                     me.state.resume(me.state.PLAY);
                     this.lastPause = this.now;
-                    this.screenDrawn = false;
                     me.game.world.removeChild(game.data.pausescreen);
                     me.game.world.removeChild(game.data.pauseText);
                 }

@@ -20,7 +20,7 @@ game.PlayScreen = me.ScreenObject.extend({
                 else{
                     console.log("no save data");
                 }
-                
+                game.data.gold = 0;
                 
 		this.HUD = new game.HUD.Container();
 		me.game.world.addChild(this.HUD);

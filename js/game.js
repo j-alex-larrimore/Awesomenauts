@@ -19,6 +19,8 @@ var game = {
                 creepp: "",
                 gamemanager: "",
                 pausescreen: "",
+                buyscreen: "",
+                buytext: "",
                 pausePos: "",
                 pauseText: "",
                 teammate1: "",
