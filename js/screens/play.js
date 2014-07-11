@@ -37,7 +37,7 @@ game.PlayScreen = me.ScreenObject.extend({
 	},
         
         resetPlayer: function(x, y){
-                game.data.player = me.pool.pull("player", x, y, {});
+                game.data.player = me.pool.pull("player", 10, 150, {});
                 game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
                 game.data.minimap = me.pool.pull("miniMap", 10, 10, {});
                 game.data.gamemanager = me.pool.pull("gameManager", 0, 0, {});

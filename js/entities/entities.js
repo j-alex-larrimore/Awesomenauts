@@ -134,7 +134,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
        }
        
        if(this.vel.x !== 0){
-            if(!this.renderable.isCurrentAnimation("run") && !this.renderable.isCurrentAnimation("attack")){
+            if(!this.renderable.isCurrentAnimation("run") && !this.renderable.isCurrentAnimation("attack") && !this.renderable.isCurrentAnimation("die")){
                 this.renderable.setCurrentAnimation("run");
                 this.renderable.setAnimationFrame();
            }
@@ -175,38 +175,63 @@ game.PlayerEntity = me.ObjectEntity.extend({
                 this.pos.x = this.pos.x + 1;
             }
             else if((xdif > -35) && (xdif < 0) &&(ydif > -55)){
-                this.vel.x = 0;
+                this.vel.x = 0; 
                 this.pos.x = this.pos.x - 1;
             }
         
             if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 800 && (Math.abs(this.pos.y-bcollision.obj.pos.y)<=40)){
                 if((this.facing === "left" && (this.pos.x > bcollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < bcollision.obj.pos.x))){
                     this.lastHit = this.now;
-                    bcollision.obj.loseHealth(20);
+                    bcollision.obj.loseHealth(this.attack);
                 }
             }
        }
        
        if(pcollision){
+           console.log("player");
+           var ydif = this.pos.y - pcollision.obj.pos.y;
+           var xdif = this.pos.x - pcollision.obj.pos.x;
+           if(xdif > 0){
+               this.pos.x = this.pos.x + 1;
+               if(this.facing === "left"){
+                    this.vel.x = 0;
+               }
+           }
+           else{
+               this.pos.x = this.pos.x - 1;
+               if(this.facing === "right"){
+                    this.vel.x = 0;
+               }
+           }
            
+           if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 1000 && (Math.abs(this.pos.y-pcollision.obj.pos.y)<=40)){
+                if((this.facing === "left" && (this.pos.x > pcollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < pcollision.obj.pos.x))){
+                    this.lastHit = this.now;
+                    pcollision.obj.loseHealth(this.attack);
+                }
+           }
        }
        
        if(ccollision){
            var ydif = this.pos.y - ccollision.obj.pos.y;
            var xdif = this.pos.x - ccollision.obj.pos.x;
-           if(xdif > 0){
-               this.vel.x = 0;
+           if(xdif > 0){               
                this.pos.x = this.pos.x + 1;
+               if(this.facing === "left"){
+                    this.vel.x = 0;
+               }
            }
            else{
-               this.vel.x = 0;
                this.pos.x = this.pos.x - 1;
+               if(this.facing === "right"){
+                    this.vel.x = 0;
+               }
            }
            
            if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 1000 && (Math.abs(this.pos.y-ccollision.obj.pos.y)<=40)){
                 if((this.facing === "left" && (this.pos.x > ccollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < ccollision.obj.pos.x))){
                     this.lastHit = this.now;
-                    ccollision.obj.loseHealth(10);
+                    ccollision.obj.loseHealth(this.attack);
                 }
            }
        }
@@ -218,25 +243,25 @@ game.PlayerEntity = me.ObjectEntity.extend({
    } 
 });
 
-game.LevelTrigger = me.ObjectEntity.extend({
-   init: function (x, y, settings){
-       this.parent(x, y, settings);
-       this.collidable = true;
-       this.level = settings.level;
-       this.xSpawn = settings.xSpawn;
-       this.ySpawn = settings.ySpawn;
-   },
-           
-   onCollision: function(){
-       this.collidable = false;
-       var x = this.xSpawn;
-       var y = this.ySpawn;
-       me.levelDirector.loadLevel(this.level);
-       me.state.current().resetPlayer(x, y);
-   }
-   
-   
-});
+//game.LevelTrigger = me.ObjectEntity.extend({
+//   init: function (x, y, settings){
+//       this.parent(x, y, settings);
+//       this.collidable = true;
+//       this.level = settings.level;
+//       this.xSpawn = settings.xSpawn;
+//       this.ySpawn = settings.ySpawn;
+//   },
+//           
+//   onCollision: function(){
+//       this.collidable = false;
+//       var x = this.xSpawn;
+//       var y = this.ySpawn;
+//       me.levelDirector.loadLevel(this.level);
+//       me.state.current().resetPlayer(x, y);
+//   }
+//   
+//   
+//});
 
 game.PlayerBaseEntity = me.ObjectEntity.extend({
     
@@ -248,7 +273,7 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       this.health = 100;
+       this.health = 1000;
        this.collidable = true;
        this.team = false;
        this.alwaysUpdate = true;
@@ -301,7 +326,7 @@ game.EnemyBaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       this.health = 100;
+       this.health = 1000;
        this.collidable = true;
        this.team = false;
        this.alwaysUpdate = true;
@@ -559,9 +584,6 @@ game.miniECreepLocation = me.SpriteObject.extend({
    
 });
 
-
-
-
 game.MiniMap = me.ObjectEntity.extend({
     
     init: function (x, y, settings){
@@ -613,17 +635,19 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.parent(x, y, settings);
        this.last = new Date().getTime();
        this.now = new Date().getTime();
+       this.lastAttacking = this.now;
        this.collidable = true;
        this.alwaysUpdate = true;
-       this.attack = false;
+       this.attacking = false;
        this.jumping = false;
        this.health = 10;
        this.type = "EnemyCreep";
        this.lastPosX = x;
+       this.attack = 1;
        
        this.lastHit = new Date().getTime();
        
-       this.setVelocity(7, 20);
+       this.setVelocity(5, 20);
        
        //this.mini = new game.miniECreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
        this.mini = me.pool.pull("miniECreep", 10, 10, 3, {});
@@ -644,7 +668,7 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.now = new Date().getTime();
        this.mini.updateMini(this.pos.x, this.pos.y);
        
-        if (this.health <= 0){
+        if (this.health <= 0 || this.health === Math.NaN){
            me.game.world.removeChild(this.mini); 
            me.game.world.removeChild(this);
         }
@@ -655,22 +679,24 @@ game.EnemyCreep = me.ObjectEntity.extend({
         var tcollision = me.game.world.collideType(this, "PlayerTeammate");
         
         if(bcollision){
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             this.vel.x = 0;
             this.pos.x = this.pos.x + 1;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
-                bcollision.obj.loseHealth(1);
+                bcollision.obj.loseHealth(this.attack);
             }
         }
         else if(pcollision){
              var ydif = this.pos.y - pcollision.obj.pos.y;
              var xdif = this.pos.x - pcollision.obj.pos.x;
              this.vel.x = 0;             
-             this.attack = true; 
+             this.attacking = true; 
+             this.lastAttacking = this.now;
              if((this.now-this.lastHit >= 1000) && !pcollision.obj.renderable.isCurrentAnimation("attack")){
                 this.lastHit = this.now;
-                pcollision.obj.loseHealth(1);
+                pcollision.obj.loseHealth(this.attack);
              }
              
              if(xdif > 0){
@@ -685,10 +711,12 @@ game.EnemyCreep = me.ObjectEntity.extend({
              var ydif = this.pos.y - tcollision.obj.pos.y;
              var xdif = this.pos.x - tcollision.obj.pos.x;
              this.vel.x = 0;             
-             this.attack = true; 
-             if((this.now-this.lastHit >= 1000) && !tcollision.obj.renderable.isCurrentAnimation("attack")){
+             this.attacking = true; 
+             this.lastAttacking = this.now;
+             //if((this.now-this.lastHit >= 1000) && !tcollision.obj.renderable.isCurrentAnimation("attack")){
+             if((this.now-this.lastHit) >= 1000){
                 this.lastHit = this.now;
-                tcollision.obj.loseHealth(1);
+                tcollision.obj.loseHealth(this.attack);
              }
              
              if(xdif > 0){
@@ -702,7 +730,7 @@ game.EnemyCreep = me.ObjectEntity.extend({
         else if(ccollision){
             this.vel.x = 0;
             this.pos.x = this.pos.x + 1;
-            this.attack = true;
+            this.attacking = true;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
                 ccollision.obj.loseHealth(1);
@@ -712,13 +740,13 @@ game.EnemyCreep = me.ObjectEntity.extend({
             this.vel.x -= this.accel.x * me.timer.tick;
         }        
 
-        if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
+        if(this.pos.x === this.lastPosX && this.attacking === false && !this.jumping && !this.falling && (this.now-this.lastAttacking >= 3000)){
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
                 //this.vel.x -= this.accel.x * me.timer.tick;
             
         }
-        this.attack = false;
+        this.attacking = false;
         this.lastPosX = this.pos.x;
         this.parent(delta);
         this.updateMovement();
@@ -737,11 +765,13 @@ game.PlayerCreep = me.ObjectEntity.extend({
        this.last = new Date().getTime();
        this.now = new Date().getTime();
        this.lastHit = new Date().getTime();
+       this.lastAttacking = this.now;
        this.alwaysUpdate = true;
        this.collidable = true;
        this.health = 5;
        this.type = "PlayerCreep";
        this.lastPosX = x;
+       this.attack = 1;
        
        this.setVelocity(3, 20);
        
@@ -775,7 +805,8 @@ game.PlayerCreep = me.ObjectEntity.extend({
         var ccollision = me.game.world.collideType(this, "EnemyCreep");
         
         if(bcollision){
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             this.vel.x = 0;
             this.pos.x = this.pos.x - 1;
             if((this.now-this.lastHit >= 1000)){
@@ -791,8 +822,10 @@ game.PlayerCreep = me.ObjectEntity.extend({
              var ydif = this.pos.y - pcollision.obj.pos.y;
              var xdif = this.pos.x - pcollision.obj.pos.x;
              this.vel.x = 0;             
-             this.attack = true; 
-             if((this.now-this.lastHit >= 1000) && !pcollision.obj.renderable.isCurrentAnimation("attack")){
+             this.attacking = true;
+             this.lastAttacking = this.now;
+             //if((this.now-this.lastHit >= 1000) && !pcollision.obj.renderable.isCurrentAnimation("attack")){
+             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
                 pcollision.obj.loseHealth(this.attack);
              }
@@ -807,7 +840,8 @@ game.PlayerCreep = me.ObjectEntity.extend({
         else if(ccollision){
             this.vel.x = 0;
             this.pos.x = this.pos.x - 1;
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
                 ccollision.obj.loseHealth(this.attack);
@@ -821,13 +855,13 @@ game.PlayerCreep = me.ObjectEntity.extend({
             this.vel.x += this.accel.x * me.timer.tick;
         }        
 
-        if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
+        if(this.pos.x === this.lastPosX && this.attacking === false && !this.jumping && !this.falling && (this.now-this.lastAttacking >= 3000)){
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
                 //this.vel.x -= this.accel.x * me.timer.tick;
             
         }
-        this.attack = false;
+        this.attacking = false;
         this.lastPosX = this.pos.x;
         this.parent(delta);
         this.updateMovement();
@@ -845,7 +879,6 @@ game.EnemyEntity = me.ObjectEntity.extend({
        
        
        if(char === 1){           
-           console.log("archer");
            settings.image = "archer";
            this.parent(x, y, settings);
            this.maxHealth = 1;
@@ -857,8 +890,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 2){
-           console.log("darkelf");
+       else if(char === 100){
            settings.image = "darkelf";
            this.parent(x, y, settings);
            this.maxHealth = 1;
@@ -870,8 +902,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 3){
-           console.log("orc");
+       else if(char === 3 || char === 2){
            settings.image = "orcSpear";
            this.parent(x, y, settings);
            this.maxHealth = 100;
@@ -883,8 +914,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 4){
-           console.log("wizard");
+       else if(char === 4 || char === 5){
            settings.image = "wizard";
            this.parent(x, y, settings);
            this.maxHealth = 100;
@@ -896,8 +926,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 5){
-           console.log("skeleton");
+       else if(char === 100){
            settings.image = "skeletonBigSword";
            this.parent(x, y, settings);
            this.maxHealth = 100;
@@ -918,6 +947,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
        this.last = new Date().getTime();
        this.now = new Date().getTime();
        this.lastHit = new Date().getTime();
+       this.lastAttacking = this.now;
        this.dead = false;
        this.health = this.maxHealth;
        this.type = "EnemyEntity";
@@ -939,17 +969,18 @@ game.EnemyEntity = me.ObjectEntity.extend({
     update: function(delta){
        this.now = new Date().getTime();
        this.mini.updateMini(this.pos.x, this.pos.y);
-       
         if (this.health <= 0){
             if(this.dead === false){
+                
                 this.deathtimer = new Date().getTime();
                 this.renderable.setCurrentAnimation("die");
                 this.renderable.setAnimationFrame();
                 this.dead = true;
            }
            else if(this.now - this.deathtimer > 480){
+               
                this.renderable.setCurrentAnimation("run");
-               this.pos.x = 10;
+               this.pos.x = 11000;
                this.pos.y = 150;
                this.health = this.maxHealth;
                this.dead = false;
@@ -969,7 +1000,8 @@ game.EnemyEntity = me.ObjectEntity.extend({
         var tcollision = me.game.world.collideType(this, "PlayerTeammate");
         
         if(bcollision){
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             this.vel.x = 0;
             this.pos.x = this.pos.x + 1;
             if((this.now-this.lastHit >= 1000)){
@@ -986,8 +1018,9 @@ game.EnemyEntity = me.ObjectEntity.extend({
             var xdif = this.pos.x - pcollision.obj.pos.x;
              this.vel.x = 0;
              this.pos.x = this.pos.x - 1;
-             this.attack = true; 
-             if((this.now-this.lastHit >= 1000)){
+             this.attacking = true; 
+             this.lastAttacking = this.now;
+             if(this.now-this.lastHit >= 1000 && !pcollision.obj.renderable.isCurrentAnimation("attack")){
                 this.lastHit = this.now;
                 pcollision.obj.loseHealth(this.attack);
                 if(!this.renderable.isCurrentAnimation("attack")){
@@ -1000,10 +1033,16 @@ game.EnemyEntity = me.ObjectEntity.extend({
              var ydif = this.pos.y - tcollision.obj.pos.y;
              var xdif = this.pos.x - tcollision.obj.pos.x;
              this.vel.x = 0;             
-             this.attack = true; 
-             if((this.now-this.lastHit >= 1000) && !tcollision.obj.renderable.isCurrentAnimation("attack")){
+             this.attacking = true;
+             this.lastAttacking = this.now;
+             //if((this.now-this.lastHit >= 1000) && !tcollision.obj.renderable.isCurrentAnimation("attack")){
+             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
                 tcollision.obj.loseHealth(this.attack);
+                if(!this.renderable.isCurrentAnimation("attack")){
+                    this.renderable.setCurrentAnimation("attack", "run");
+                    this.renderable.setAnimationFrame();
+                }
              }
              
              if(xdif > 0){
@@ -1017,7 +1056,8 @@ game.EnemyEntity = me.ObjectEntity.extend({
         else if(ccollision){
             this.vel.x = 0;
             this.pos.x = this.pos.x + 1;
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
                 ccollision.obj.loseHealth(this.attack);
@@ -1031,13 +1071,14 @@ game.EnemyEntity = me.ObjectEntity.extend({
             this.vel.x -= this.accel.x * me.timer.tick;
         }        
 
-        if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
+        if(this.pos.x === this.lastPosX && this.attacking === false && !this.jumping && !this.falling && (this.now-this.lastAttacking >= 3000)){
+            //console.log("this.pos.x " + this.pos.x + " this.lastPosX " + this.lastPosX + " this.attacking " + this.attacking + " this.now-this.lastHit " + (this.now-this.lastHit));
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
                 //this.vel.x -= this.accel.x * me.timer.tick;
             
         }
-        this.attack = false;
+        this.attacking = false;
         this.lastPosX = this.pos.x;
         this.parent(delta);
         this.updateMovement();
@@ -1054,8 +1095,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
        var char = Math.floor(Math.random()* 5)+1;
        
        
-       if(char === 1){           
-           console.log("archer");
+       if(char === 1 || char === 2){       
            settings.image = "archer";
            this.parent(x, y, settings);
            this.maxHealth = 1;
@@ -1067,8 +1107,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 2){
-           console.log("darkelf");
+       else if(char === 100){
            settings.image = "darkelf";
            this.parent(x, y, settings);
            this.maxHealth = 1;
@@ -1081,7 +1120,6 @@ game.PlayerTeammate = me.ObjectEntity.extend({
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
        else if(char === 3){
-           console.log("orc");
            settings.image = "orcSpear";
            this.parent(x, y, settings);
            this.maxHealth = 100;
@@ -1093,8 +1131,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 4){
-           console.log("wizard");
+       else if(char === 4 || char === 5){
            settings.image = "wizard";
            this.parent(x, y, settings);
            this.maxHealth = 100;
@@ -1106,8 +1143,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 5){
-           console.log("skeleton");
+       else if(char === 100){
            settings.image = "skeletonBigSword";
            this.parent(x, y, settings);
            this.maxHealth = 100;
@@ -1128,6 +1164,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
        this.last = new Date().getTime();
        this.now = new Date().getTime();
        this.lastHit = new Date().getTime();
+       this.lastAttacking = this.now;
        this.dead = false;
        this.health = this.maxHealth;
        this.type = "PlayerTeammate";
@@ -1143,7 +1180,6 @@ game.PlayerTeammate = me.ObjectEntity.extend({
     },
     
      loseHealth: function(dmg){
-        
        this.health = this.health - dmg;
        
    },
@@ -1180,12 +1216,13 @@ game.PlayerTeammate = me.ObjectEntity.extend({
         var ccollision = me.game.world.collideType(this, "EnemyCreep");
         
         if(bcollision){
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             this.vel.x = 0;
             this.pos.x = this.pos.x - 1;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
-                bcollision.obj.loseHealth(1);
+                bcollision.obj.loseHealth(this.attack);
                 if(!this.renderable.isCurrentAnimation("attack")){
                     this.renderable.setCurrentAnimation("attack", "run");
                     this.renderable.setAnimationFrame();
@@ -1197,10 +1234,11 @@ game.PlayerTeammate = me.ObjectEntity.extend({
             var xdif = this.pos.x - pcollision.obj.pos.x;
              this.vel.x = 0;
              this.pos.x = this.pos.x - 1;
-             this.attack = true; 
+             this.attacking = true; 
+             this.lastAttacking = this.now;
              if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
-                pcollision.obj.loseHealth(1);
+                pcollision.obj.loseHealth(this.attack);
                 if(!this.renderable.isCurrentAnimation("attack")){
                     this.renderable.setCurrentAnimation("attack", "run");
                     this.renderable.setAnimationFrame();
@@ -1210,10 +1248,11 @@ game.PlayerTeammate = me.ObjectEntity.extend({
         else if(ccollision){
             this.vel.x = 0;
             this.pos.x = this.pos.x - 1;
-            this.attack = true;
+            this.attacking = true;
+            this.lastAttacking = this.now;
             if((this.now-this.lastHit >= 1000)){
                 this.lastHit = this.now;
-                ccollision.obj.loseHealth(1);
+                ccollision.obj.loseHealth(this.attack);
                 if(!this.renderable.isCurrentAnimation("attack")){
                     this.renderable.setCurrentAnimation("attack", "run");
                     this.renderable.setAnimationFrame();
@@ -1224,20 +1263,19 @@ game.PlayerTeammate = me.ObjectEntity.extend({
             this.vel.x += this.accel.x * me.timer.tick;
         }        
 
-        if(this.pos.x === this.lastPosX && this.attack === false && !this.jumping && !this.falling && (this.now-this.lastHit >= 3000)){
+        if(this.pos.x === this.lastPosX && this.attacking === false && !this.jumping && !this.falling && (this.now-this.lastAttacking >= 3000)){
                 this.jumping = true;
                 this.vel.y -= this.accel.y * me.timer.tick;
                 //this.vel.x -= this.accel.x * me.timer.tick;
             
         }
-        this.attack = false;
+        this.attacking = false;
         this.lastPosX = this.pos.x;
         this.parent(delta);
         this.updateMovement();
         return true;
     }
 });
-
 
 game.GameManager = Object.extend({
    init: function (x, y, settings){

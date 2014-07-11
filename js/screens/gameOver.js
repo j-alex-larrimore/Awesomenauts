@@ -9,7 +9,6 @@ game.GameOver = me.ScreenObject.extend({
 	 *  action to perform on state change
 	 */
 	onResetEvent: function(win) {
-            console.log("Win? " + win); 
             me.game.world.addChild( new me.SpriteObject (0, 0, me.loader.getImage('game_over')), -10);
            // me.input.bindPointer(me.input.mouse.LEFT, "select");
            if(win){
@@ -18,9 +17,7 @@ game.GameOver = me.ScreenObject.extend({
            else{
                game.data.exp = game.data.exp + 1;
            }
-           console.log(game.data.exp);
            me.save.exp = game.data.exp;
-           console.log(me.save.exp);
            
             me.game.world.addChild(new (me.Renderable.extend ({
                 init: function(){
@@ -59,7 +56,6 @@ game.GameOver = me.ScreenObject.extend({
                 },
                 
                 newGame: function(x){
-                    console.log("New Game");
                     me.state.change(me.state.CHARSELECT);
                     me.input.releasePointerEvent('pointerdown', this);
                 }
@@ -86,7 +82,6 @@ game.GameOver = me.ScreenObject.extend({
                 },
                 
                 newGame: function(x){
-                    console.log("Load");
                     me.state.change(me.state.CHARSELECT);
                     me.input.releasePointerEvent('pointerdown', this);
                     
