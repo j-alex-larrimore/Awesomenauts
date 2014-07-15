@@ -24,6 +24,10 @@ game.resources = [
         { name: "skeletonBigSwordIcon", type: "image", src: "data/img/skeletonBigSwordIcon.png" },
         { name: "wizardIcon", type: "image", src: "data/img/wizardIcon.png" },
         
+        { name: "magic", type: "image", src: "data/img/magic.png" },
+        { name: "spear", type: "image", src: "data/img/spear.png" },
+        { name: "fireball", type: "image", src: "data/img/fireball.png" },
+        { name: "arrow", type: "image", src: "data/img/arrow.png" },
         
         { name: "creep1", type: "image", src: "data/img/gloop.png"},
         { name: "creep2", type: "image", src: "data/img/brainmonster.png"},

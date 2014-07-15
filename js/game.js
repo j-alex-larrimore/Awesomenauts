@@ -29,6 +29,7 @@ var game = {
                 enemy1: "",
                 enemy2: "",
                 enemy3: "",
+                mySpeed: "",
                 archerBaseHealth: 50,
                 archerBaseDamage: 10,
                 archerBaseSpeed: 4,
@@ -66,7 +67,8 @@ var game = {
 		return;
 	}        
         
-        me.save.add({exp : 0});
+        me.save.add({exp : 0, exp1: 0, exp2: 0, exp3: 0, exp4: 0});
+        
 
 	// add "#debug" to the URL to enable the debug Panel
 	if (document.location.hash === "#debug") {
@@ -128,6 +130,10 @@ var game = {
                 me.pool.register("miniECreep", game.miniECreepLocation, true);
                 me.pool.register("miniEnemy", game.miniEnemyLocation, true);
                 me.pool.register("miniTeammate", game.miniTeammateLocation, true);
+                me.pool.register("arrow", game.ArrowEntity, true);
+                me.pool.register("fireball", game.Fireball, true);
+                me.pool.register("magic", game.MagicMissile, true);
+                me.pool.register("spear", game.SpearThrow, true);
 
                 me.input.bindKey(me.input.KEY.RIGHT, "right");
                 me.input.bindKey(me.input.KEY.LEFT, "left");

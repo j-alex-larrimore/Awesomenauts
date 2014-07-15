@@ -18,6 +18,10 @@ game.GameOver = me.ScreenObject.extend({
                game.data.exp = game.data.exp + 1;
            }
            me.save.exp = game.data.exp;
+           me.save.exp1 = game.data.exp1;
+           me.save.exp2 = game.data.exp2;
+           me.save.exp3 = game.data.exp3;
+           me.save.exp4 = game.data.exp4;
            
             me.game.world.addChild(new (me.Renderable.extend ({
                 init: function(){
