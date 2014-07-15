@@ -21,13 +21,39 @@ var game = {
                 pausescreen: "",
                 buyscreen: "",
                 buytext: "",
+                buytext2: "",
                 pausePos: "",
                 pauseText: "",
                 teammate1: "",
                 teammate2: "",
                 enemy1: "",
                 enemy2: "",
-                enemy3: ""
+                enemy3: "",
+                archerBaseHealth: 50,
+                archerBaseDamage: 10,
+                archerBaseSpeed: 4,
+                archerBaseDef: 0,
+                wizardBaseHealth: 40,
+                wizardBaseDamage: 5,
+                wizardBaseSpeed: 3,
+                wizardBaseDef:0,
+                skeletonBaseHealth: 80,
+                skeletonBaseDamage: 10,
+                skeletonBaseSpeed: 2,
+                skeletonBaseDef: 0,
+                elfBaseHealth: 60,
+                elfBaseDamage: 10,
+                elfBaseSpeed: 3,
+                elfBaseDef: 0,
+                orcBaseHealth: 100,
+                orcBaseDamage: 10,
+                orcBaseSpeed: 5,
+                orcBaseDef: 0,
+                exp1: 0,
+                exp2: 0,
+                exp3: 0,
+                exp4: 0
+                
 	},
 	
         
@@ -50,9 +76,9 @@ var game = {
 	}
         me.state.CHARSELECT = 111;
         me.state.SPENDEXP = 112;
-        me.state.SPENDGOLD = 113;
-        me.state.NEWPROFILE = 114;
-        me.state.LOADPROFILE = 115;
+        //me.state.SPENDGOLD = 113;
+        //me.state.NEWPROFILE = 114;
+        //me.state.LOADPROFILE = 115;
                 
         me.sys.pauseOnBlur = false;             ///Need this and the next line to keep the game from unpausing when you switch to other tabs in your browser
         me.sys.resumeOnFocus = false;

@@ -9,10 +9,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            console.log("archer");
            settings.image = "archer";
            this.parent(x, y, settings);
-           this.maxHealth = 1;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(20, 20);
+           this.maxHealth = game.data.archerBaseHealth;
+           this.attack = game.data.archerBaseDamage;
+           this.defense = game.data.archerBaseDef;
+           this.setVelocity(game.data.archerBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -22,10 +22,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            console.log("darkelf");
            settings.image = "darkelf";
            this.parent(x, y, settings);
-           this.maxHealth = 1;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(20, 20);
+           this.maxHealth = game.data.elfBaseHealth;
+           this.attack = game.data.elfBaseDamage;
+           this.defense = game.data.elfBaseDef;
+           this.setVelocity(game.data.elfBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -35,10 +35,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            console.log("orc");
            settings.image = "orcSpear";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(20, 20);
+           this.maxHealth = game.data.orcBaseHealth;
+           this.attack = game.data.orcBaseDamage;
+           this.defense = game.data.orcBaseDef;
+           this.setVelocity(game.data.orcBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -48,10 +48,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            console.log("wizard");
            settings.image = "wizard";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(20, 20);
+           this.maxHealth = game.data.wizardBaseHealth;
+           this.attack = game.data.wizardBaseDamage;
+           this.defense = game.data.wizardBaseDef;
+           this.setVelocity(game.data.wizardBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -61,10 +61,10 @@ game.PlayerEntity = me.ObjectEntity.extend({
            console.log("skeleton");
            settings.image = "skeletonBigSword";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(20, 20);
+           this.maxHealth = game.data.skeletonBaseHealth;
+           this.attack = game.data.skeletonBaseDamage;
+           this.defense = game.data.skeletonBaseDef;
+           this.setVelocity(game.data.skeletonBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -82,6 +82,12 @@ game.PlayerEntity = me.ObjectEntity.extend({
        this.health = this.maxHealth;
        this.facing = "right";
        this.type = "PlayerEntity";
+       this.skill1 = 0;                 //These six variables keep track of spent gold
+       this.skill2 = 0;
+       this.skill3 = 0;
+       this.ability1 = 0;
+       this.ability2 = 0;
+       this.ability3 = 0;
        this.team = true;
        
        this.collidable = true;
@@ -165,16 +171,18 @@ game.PlayerEntity = me.ObjectEntity.extend({
         if(bcollision){
             var ydif = this.pos.y - bcollision.obj.pos.y;
             var xdif = this.pos.x - bcollision.obj.pos.x;
-            if(ydif < -55 && (xdif < 60) && (xdif > -35)){
+            
+            
+            if(ydif < -50 && (xdif < 60) && (xdif > -35)){
                 this.falling = false;
                 this.vel.y = 0;
                 this.pos.y = this.pos.y - 1;
             }
-            else if((xdif > 0)&&(xdif < 60)&&(ydif > -55)){
+            else if((xdif > 0)&&(xdif < 60)&&(ydif > -50)){
                 this.vel.x = 0;
                 this.pos.x = this.pos.x + 1;
             }
-            else if((xdif > -35) && (xdif < 0) &&(ydif > -55)){
+            else if((xdif > -35) && (xdif < 0) &&(ydif > -50)){
                 this.vel.x = 0; 
                 this.pos.x = this.pos.x - 1;
             }
@@ -188,7 +196,6 @@ game.PlayerEntity = me.ObjectEntity.extend({
        }
        
        if(pcollision){
-           console.log("player");
            var ydif = this.pos.y - pcollision.obj.pos.y;
            var xdif = this.pos.x - pcollision.obj.pos.x;
            if(xdif > 0){
@@ -235,7 +242,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
            if(this.renderable.isCurrentAnimation("attack") && this.now-this.lastHit >= 1000 && (Math.abs(this.pos.y-ccollision.obj.pos.y)<=40)){
                 if((this.facing === "left" && (this.pos.x > ccollision.obj.pos.x))||(this.facing === "right" && (this.pos.x < ccollision.obj.pos.x))){
                     this.lastHit = this.now;
-                    if(pcollision.obj.health < this.attack){
+                    if(ccollision.obj.health < this.attack){
                         game.data.gold += 1;
                         console.log("Current gold: " + game.data.gold);
                     }
@@ -251,26 +258,6 @@ game.PlayerEntity = me.ObjectEntity.extend({
    } 
 });
 
-//game.LevelTrigger = me.ObjectEntity.extend({
-//   init: function (x, y, settings){
-//       this.parent(x, y, settings);
-//       this.collidable = true;
-//       this.level = settings.level;
-//       this.xSpawn = settings.xSpawn;
-//       this.ySpawn = settings.ySpawn;
-//   },
-//           
-//   onCollision: function(){
-//       this.collidable = false;
-//       var x = this.xSpawn;
-//       var y = this.ySpawn;
-//       me.levelDirector.loadLevel(this.level);
-//       me.state.current().resetPlayer(x, y);
-//   }
-//   
-//   
-//});
-
 game.PlayerBaseEntity = me.ObjectEntity.extend({
     
    init: function(x, y, settings){
@@ -281,7 +268,7 @@ game.PlayerBaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       this.health = 1000;
+       this.health = 500;
        this.collidable = true;
        this.team = false;
        this.alwaysUpdate = true;
@@ -334,7 +321,7 @@ game.EnemyBaseEntity = me.ObjectEntity.extend({
        settings.height = 100;
        this.parent(x, y, settings);
        this.broken = false;
-       this.health = 1000;
+       this.health = 500;
        this.collidable = true;
        this.team = false;
        this.alwaysUpdate = true;
@@ -537,7 +524,7 @@ game.miniPCreepLocation = me.SpriteObject.extend({
            
    updateMini: function(x, y){
         this.pos.x = (10 + (x * 0.062));
-        this.pos.y = (10 + (y * 0.06));
+        this.pos.y = (13 + (y * 0.06));
        
 //        this.pos.x = (10 + (game.data.player.pos.x *0.062));
 //        this.pos.y = (10 + (game.data.player.pos.y *0.06));
@@ -648,14 +635,15 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.alwaysUpdate = true;
        this.attacking = false;
        this.jumping = false;
-       this.health = 10;
+       this.health = 30;
        this.type = "EnemyCreep";
        this.lastPosX = x;
-       this.attack = 1;
+       this.attack = 5;
+       this.jump = false;
        
        this.lastHit = new Date().getTime();
        
-       this.setVelocity(5, 20);
+       this.setVelocity(3, 20);
        
        //this.mini = new game.miniECreepLocation(10, 10, 3, {}); //game.data.miniplayer = me.pool.pull("miniPlayer", 10, 10, 5, {});
        this.mini = me.pool.pull("miniECreep", 10, 10, 3, {});
@@ -676,9 +664,18 @@ game.EnemyCreep = me.ObjectEntity.extend({
        this.now = new Date().getTime();
        this.mini.updateMini(this.pos.x, this.pos.y);
        
-        if (this.health <= 0 || this.health === Math.NaN){
+        if (this.health <= 0){
            me.game.world.removeChild(this.mini); 
            me.game.world.removeChild(this);
+        }
+        
+        if(this.jump === false && this.jumping === false &&  this.pos.x > 8560 && this.pos.x <8690){
+            var up = Math.floor(Math.random()* 2)+1;
+            this.jump = true;
+            console.log("up " + up); 
+            if(up === 1){
+                this.vel.y -= this.accel.y * me.timer.tick;
+            }
         }
         
         var bcollision = me.game.world.collideType(this, "PlayerBaseEntity");
@@ -776,10 +773,11 @@ game.PlayerCreep = me.ObjectEntity.extend({
        this.lastAttacking = this.now;
        this.alwaysUpdate = true;
        this.collidable = true;
-       this.health = 5;
+       this.health = 20;
        this.type = "PlayerCreep";
        this.lastPosX = x;
-       this.attack = 1;
+       this.attack = 5;
+       this.jump = false;
        
        this.setVelocity(3, 20);
        
@@ -806,6 +804,14 @@ game.PlayerCreep = me.ObjectEntity.extend({
         if (this.health <= 0){
            me.game.world.removeChild(this.mini); 
            me.game.world.removeChild(this);
+        }
+        
+        if(this.jump === false && this.jumping === false &&  this.pos.x > 2700 && this.pos.x <2800){
+            var up = Math.floor(Math.random()* 2)+1;
+            this.jump = true;
+            if(up === 1){
+                this.vel.y -= this.accel.y * me.timer.tick;
+            }
         }
         
         var bcollision = me.game.world.collideType(this, "EnemyBaseEntity");
@@ -889,58 +895,58 @@ game.EnemyEntity = me.ObjectEntity.extend({
        if(char === 1){           
            settings.image = "archer";
            this.parent(x, y, settings);
-           this.maxHealth = 1;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(4, 20);
+           this.maxHealth = game.data.archerBaseHealth;
+           this.attack = game.data.archerBaseDamage;
+           this.defense = game.data.archerBaseDef;
+           this.setVelocity(game.data.archerBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 100){
+       else if(char === 2){
            settings.image = "darkelf";
            this.parent(x, y, settings);
-           this.maxHealth = 1;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(5, 20);
+           this.maxHealth = game.data.elfBaseHealth;
+           this.attack = game.data.elfBaseDamage;
+           this.defense = game.data.elfBaseDef;
+           this.setVelocity(game.data.elfBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 3 || char === 2){
+       else if(char === 3){
            settings.image = "orcSpear";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(6, 20);
+           this.maxHealth = game.data.orcBaseHealth;
+           this.attack = game.data.orcBaseDamage;
+           this.defense = game.data.orcBaseDef;
+           this.setVelocity(game.data.orcBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 4 || char === 5){
+       else if(char === 4){
            settings.image = "wizard";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(3, 20);
+           this.maxHealth = game.data.wizardBaseHealth;
+           this.attack = game.data.wizardBaseDamage;
+           this.defense = game.data.wizardBaseDef;
+           this.setVelocity(game.data.wizardBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 100){
+       else if(char === 5){
            settings.image = "skeletonBigSword";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(2, 20);
+           this.maxHealth = game.data.skeletonBaseHealth;
+           this.attack = game.data.skeletonBaseDamage;
+           this.defense = game.data.skeletonBaseDef;
+           this.setVelocity(game.data.skeletonBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -1103,25 +1109,25 @@ game.PlayerTeammate = me.ObjectEntity.extend({
        var char = Math.floor(Math.random()* 5)+1;
        
        
-       if(char === 1 || char === 2){       
+       if(char === 1){       
            settings.image = "archer";
            this.parent(x, y, settings);
-           this.maxHealth = 1;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(4, 20);
+           this.maxHealth = game.data.archerBaseHealth;
+           this.attack = game.data.archerBaseDamage;
+           this.defense = game.data.archerBaseDef;
+           this.setVelocity(game.data.archerBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 100){
+       else if(char === 2){
            settings.image = "darkelf";
            this.parent(x, y, settings);
-           this.maxHealth = 1;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(5, 20);
+           this.maxHealth = game.data.elfBaseHealth;
+           this.attack = game.data.elfBaseDamage;
+           this.defense = game.data.elfBaseDef;
+           this.setVelocity(game.data.elfBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -1130,34 +1136,34 @@ game.PlayerTeammate = me.ObjectEntity.extend({
        else if(char === 3){
            settings.image = "orcSpear";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(6, 20);
+           this.maxHealth = game.data.orcBaseHealth;
+           this.attack = game.data.orcBaseDamage;
+           this.defense = game.data.orcBaseDef;
+           this.setVelocity(game.data.orcBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 4 || char === 5){
+       else if(char === 4){
            settings.image = "wizard";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(3, 20);
+           this.maxHealth = game.data.wizardBaseHealth;
+           this.attack = game.data.wizardBaseDamage;
+           this.defense = game.data.wizardBaseDef;
+           this.setVelocity(game.data.wizardBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
-       else if(char === 100){
+       else if(char === 5){
            settings.image = "skeletonBigSword";
            this.parent(x, y, settings);
-           this.maxHealth = 100;
-           this.attack = 20;
-           this.defense = 0;
-           this.setVelocity(2, 20);
+           this.maxHealth = game.data.skeletonBaseHealth;
+           this.attack = game.data.skeletonBaseDamage;
+           this.defense = game.data.skeletonBaseDef;
+           this.setVelocity(game.data.skeletonBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
            this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
@@ -1308,7 +1314,7 @@ game.GameManager = Object.extend({
    update: function(){
         this.now = new Date().getTime();
                 
-                if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000)){
+                if((Math.round(this.now/1000))%10 === 0 && (this.now - this.lastCreep >= 1000) && this.paused === false){
                         game.data.gold += 1;
                         console.log("Current gold: " + game.data.gold);
                         this.lastCreep = this.now;
@@ -1338,7 +1344,6 @@ game.GameManager = Object.extend({
                 }
                 
                 if(me.input.isKeyPressed("buy") && !this.buying && this.now-this.lastBuy >= 1000){
-                    console.log("this.buy? " + this.buying);
                     this.buying = true;
                     this.lastBuy = this.now;
                     game.data.pausePos = me.game.viewport.localToWorld(0, 0);
@@ -1360,7 +1365,420 @@ game.GameManager = Object.extend({
                         }
 
                     }));
-                    me.game.world.addChild(game.data.buytext, 35);  
+                    game.data.buytext2 = new (me.Renderable.extend ({
+                        init: function(){
+                            this.parent(new me.Vector2d(game.data.pausePos.x, game.data.pausePos.y), 1, 1);
+                            this.font = new me.Font("Arial", 20, "white");
+                            this.updateWhenPaused = true;
+                            this.alwaysUpdate = true;
+                        },
+
+                        draw: function(context){
+                            if(game.data.character === 1){
+                                if(game.data.player.skill1 === 0){
+                                    this.font.draw(context, "Skill1: Level1 - What Does This Thing Do? (shoot Farther) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 1){
+                                    this.font.draw(context, "Skill1: Level2 - What Does This Thing Do? (shoot Farther) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 2){
+                                    this.font.draw(context, "Skill1: Level3 - What Does This Thing Do? (shoot Farther) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else{
+                                    console.log("skill1 maxed");
+                                }
+                                
+                                if(game.data.player.skill2 === 0){
+                                    this.font.draw(context, "Skill2: Level1 - Throwing Arrows Seems Ineffective! (shoot Farther) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 1){
+                                    this.font.draw(context, "Skill2: Level2 - Throwing Arrows Seems Ineffective! (shoot Farther) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 2){
+                                    this.font.draw(context, "Skill2: Level3 - Throwing Arrows Seems Ineffective! (shoot Farther) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else{
+                                    console.log("skill2 maxed");
+                                }
+                                
+                                if(game.data.player.skill3 === 0){
+                                     this.font.draw(context, "Skill3: Level1 - Bowflex Time! (Increase Damage) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 1){
+                                      this.font.draw(context, "Skill3: Level2 - Bowflex Time! (Increase Damage) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 2){
+                                       this.font.draw(context, "Skill3: Level3 - Bowflex Time! (Increase Damage) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else{
+                                    console.log("skill3 maxed");
+                                }
+                                
+                                if(game.data.player.ability1 === 0){
+                                    this.font.draw(context, "AbilityQ: Level1 - No More Meatshields (arrows go through enemies) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 1){
+                                    this.font.draw(context, "AbilityQ: Level2 - No More Meatshields (arrows go through enemies) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 2){
+                                    this.font.draw(context, "AbilityQ: Level3 - No More Meatshields (arrows go through enemies) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else{
+                                    console.log("abilityq maxed");
+                                }
+                                
+                                if(game.data.player.ability2 === 0){
+                                    this.font.draw(context, "AbilityW: Level1 - You Shall Not Pass (immobilize target) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 1){
+                                    this.font.draw(context, "AbilityW: Level2 - You Shall Not Pass (immobilize target) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 2){
+                                    this.font.draw(context, "AbilityW: Level3 - You Shall Not Pass (immobilize target) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else{
+                                    console.log("abilityw maxed");
+                                }
+                                
+                                if(game.data.player.ability3 === 0){
+                                    this.font.draw(context, "AbilityE: Level1 - Rolling Deep (hide behind your friends) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 1){
+                                    this.font.draw(context, "AbilityE: Level2 - Rolling Deep (hide behind your friends) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 2){
+                                    this.font.draw(context, "AbilityE: Level3 - Rolling Deep (hide behind your friends) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else{
+                                    console.log("abilitye maxed");
+                                }                                
+                                
+                            }
+                            else if(game.data.character === 2){
+                                if(game.data.player.skill1 === 0){
+                                    this.font.draw(context, "Skill1: Level1 - You Wouldn't Like Me When I'm Angry (increase damage) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 1){
+                                    this.font.draw(context, "Skill1: Level2 - You Wouldn't Like Me When I'm Angry (increase damage) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 2){
+                                    this.font.draw(context, "Skill1: Level3 - You Wouldn't Like Me When I'm Angry (increase damage) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else{
+                                    console.log("skill1 maxed");
+                                }
+                                
+                                if(game.data.player.skill2 === 0){
+                                    this.font.draw(context, "Skill2: Level1 - Feeding Frenzy (increase attack speed) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 1){
+                                    this.font.draw(context, "Skill2: Level2 - Feeding Frenzy (increase attack speed) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 2){
+                                    this.font.draw(context, "Skill2: Level3 - Feeding Frenzy (increase attack speed) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else{
+                                    console.log("skill2 maxed");
+                                }
+                                
+                                if(game.data.player.skill3 === 0){
+                                     this.font.draw(context, "Skill3: Level1 - Must... Move... Faster... Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 1){
+                                      this.font.draw(context, "Skill3: Level2 - Must... Move... Faster... Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 2){
+                                       this.font.draw(context, "Skill3: Level3 - Must... Move... Faster... Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else{
+                                    console.log("skill3 maxed");
+                                }
+                                
+                                if(game.data.player.ability1 === 0){
+                                    this.font.draw(context, "AbilityQ: Level1 - Now You See Me, Now You Don't (enemies cant hit you) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 1){
+                                    this.font.draw(context, "AbilityQ: Level2 - Now You See Me, Now You Don't (enemies cant hit you) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 2){
+                                    this.font.draw(context, "AbilityQ: Level3 - Now You See Me, Now You Don't (enemies cant hit you) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else{
+                                    console.log("abilityq maxed");
+                                }
+                                
+                                if(game.data.player.ability2 === 0){
+                                    this.font.draw(context, "AbilityW: Level1 - I Wish I was There (teleport) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 1){
+                                    this.font.draw(context, "AbilityW: Level2 - I Wish I was There (teleport) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 2){
+                                    this.font.draw(context, "AbilityW: Level3 - I Wish I was There (teleport) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else{
+                                    console.log("abilityw maxed");
+                                }
+                                
+                                if(game.data.player.ability3 === 0){
+                                    this.font.draw(context, "AbilityE: Level1 - The Big Hurt (Power Attack) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 1){
+                                    this.font.draw(context, "AbilityE: Level2 - The Big Hurt (Power Attack) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 2){
+                                    this.font.draw(context, "AbilityE: Level3 - The Big Hurt (Power Attack) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else{
+                                    console.log("abilitye maxed");
+                                }          
+                            }
+                            else if(game.data.character === 3){
+                                if(game.data.player.skill1 === 0){
+                                    this.font.draw(context, "Skill1: Level1 - I Wish I was Big (more health) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 1){
+                                    this.font.draw(context, "Skill1: Level2 - I Wish I was Big (more health) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 2){
+                                    this.font.draw(context, "Skill1: Level3 - I Wish I was Big (more health) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else{
+                                    console.log("skill1 maxed");
+                                }
+                                
+                                if(game.data.player.skill2 === 0){
+                                    this.font.draw(context, "Skill2: Level1 - OOOOOOH Shiny (run faster) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 1){
+                                    this.font.draw(context, "Skill2: Level2 - OOOOOOH Shiny (run faster) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 2){
+                                    this.font.draw(context, "Skill2: Level3 - OOOOOOH Shiny (run faster) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else{
+                                    console.log("skill2 maxed");
+                                }
+                                
+                                if(game.data.player.skill3 === 0){
+                                     this.font.draw(context, "Skill3: Level1 - Check Out These Guns (Increase Damage) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 1){
+                                      this.font.draw(context, "Skill3: Level2 - Check Out These Guns (Increase Damage) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 2){
+                                       this.font.draw(context, "Skill3: Level3 - Check Out These Guns (Increase Damage) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else{
+                                    console.log("skill3 maxed");
+                                }
+                                
+                                if(game.data.player.ability1 === 0){
+                                    this.font.draw(context, "AbilityQ: Level1 - Adrenaline Rush (speed burst) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 1){
+                                    this.font.draw(context, "AbilityQ: Level2 - Adrenaline Rush (speed burst) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 2){
+                                    this.font.draw(context, "AbilityQ: Level3 - Adrenaline Rush (speed burst) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else{
+                                    console.log("abilityq maxed");
+                                }
+                                
+                                if(game.data.player.ability2 === 0){
+                                    this.font.draw(context, "AbilityW: Level1 - You Look Tasty (eat your own creep for health) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 1){
+                                    this.font.draw(context, "AbilityW: Level2 - You Look Tasty (eat your own creep for health) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 2){
+                                    this.font.draw(context, "AbilityW: Level3 - You Look Tasty (eat your own creep for health) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else{
+                                    console.log("abilityw maxed");
+                                }
+                                
+                                if(game.data.player.ability3 === 0){
+                                    this.font.draw(context, "AbilityE: Level1 - Shish Kabob (throw your spear) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 1){
+                                    this.font.draw(context, "AbilityE: Level2 - Shish Kabob (throw your spear) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 2){
+                                    this.font.draw(context, "AbilityE: Level3 - Shish Kabob (throw your spear) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else{
+                                    console.log("abilitye maxed");
+                                }          
+                            }
+                            else if(game.data.character === 4){
+                                if(game.data.player.skill1 === 0){
+                                    this.font.draw(context, "Skill1: Level1 - I Believe in Magic (increase range) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 1){
+                                    this.font.draw(context, "Skill1: Level2 - I Believe in Magic (increase range) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 2){
+                                    this.font.draw(context, "Skill1: Level3 - I Believe in Magic (increase range) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else{
+                                    console.log("skill1 maxed");
+                                }
+                                
+                                if(game.data.player.skill2 === 0){
+                                    this.font.draw(context, "Skill2: Level1 - Hitting the Books (Increase Damage) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 1){
+                                    this.font.draw(context, "Skill2: Level2 - Hitting the Books (Increase Damage) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 2){
+                                    this.font.draw(context, "Skill2: Level3 - Hitting the Books (Increase Damage) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else{
+                                    console.log("skill2 maxed");
+                                }
+                                
+                                if(game.data.player.skill3 === 0){
+                                     this.font.draw(context, "Skill3: Level1 - Avada Kedavra (Increase Damage) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 1){
+                                      this.font.draw(context, "Skill3: Level2 - Avada Kedavra (Increase Damage) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 2){
+                                       this.font.draw(context, "Skill3: Level3 - Avada Kedavra (Increase Damage) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else{
+                                    console.log("skill3 maxed");
+                                }
+                                
+                                if(game.data.player.ability1 === 0){
+                                    this.font.draw(context, "AbilityQ: Level1 - Freeze! Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 1){
+                                    this.font.draw(context, "AbilityQ: Level2 - Freeze! Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 2){
+                                    this.font.draw(context, "AbilityQ: Level3 - Freeze! Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else{
+                                    console.log("abilityq maxed");
+                                }
+                                
+                                if(game.data.player.ability2 === 0){
+                                    this.font.draw(context, "AbilityW: Level1 - You Shouldn't Play With Matches Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 1){
+                                    this.font.draw(context, "AbilityW: Level2 - You Shouldn't Play With Matches Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 2){
+                                    this.font.draw(context, "AbilityW: Level3 - You Shouldn't Play With Matches Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else{
+                                    console.log("abilityw maxed");
+                                }
+                                
+                                if(game.data.player.ability3 === 0){
+                                    this.font.draw(context, "AbilityE: Level1 - Move the Chess Pieces Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 1){
+                                    this.font.draw(context, "AbilityE: Level2 - Move the Chess Pieces Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 2){
+                                    this.font.draw(context, "AbilityE: Level3 - Move the Chess Pieces Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else{
+                                    console.log("abilitye maxed");
+                                }          
+                            }
+                            else if(game.data.character === 5){
+                                if(game.data.player.skill1 === 0){
+                                    this.font.draw(context, "Skill1: Level1 - Sticks and Stones May Break My Bones but Words Will Never Hurt Me (armor up) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 1){
+                                    this.font.draw(context, "Skill1: Level2 - Sticks and Stones May Break My Bones but Words Will Never Hurt Me (armor up) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else if(game.data.player.skill1 === 2){
+                                    this.font.draw(context, "Skill1: Level3 - Sticks and Stones May Break My Bones but Words Will Never Hurt Me (armor up) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 100));
+                                }
+                                else{
+                                    console.log("skill1 maxed");
+                                }
+                                
+                                if(game.data.player.skill2 === 0){
+                                    this.font.draw(context, "Skill2: Level1 - Every Day I'm Shufflin' (move faster) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 1){
+                                    this.font.draw(context, "Skill2: Level2 - Every Day I'm Shufflin' (move faster) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else if(game.data.player.skill2 === 2){
+                                    this.font.draw(context, "Skill2: Level3 - Every Day I'm Shufflin' (move faster) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 150));
+                                }
+                                else{
+                                    console.log("skill2 maxed");
+                                }
+                                
+                                if(game.data.player.skill3 === 0){
+                                     this.font.draw(context, "Skill3: Level1 - Put your Backbone Into It (Increase Damage) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 1){
+                                      this.font.draw(context, "Skill3: Level2 - Put your Backbone Into It (Increase Damage) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else if(game.data.player.skill3 === 2){
+                                       this.font.draw(context, "Skill3: Level3 - Put your Backbone Into It (Increase Damage) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 200));
+                                }
+                                else{
+                                    console.log("skill3 maxed");
+                                }
+                                
+                                if(game.data.player.ability1 === 0){
+                                    this.font.draw(context, "AbilityQ: Level1 - How do you Kill That Which Has no Life? (instant respawn) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 1){
+                                    this.font.draw(context, "AbilityQ: Level2 - How do you Kill That Which Has no Life? (instant respawn) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else if(game.data.player.ability1 === 2){
+                                    this.font.draw(context, "AbilityQ: Level3 - How do you Kill That Which Has no Life? (instant respawn) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 250));
+                                }
+                                else{
+                                    console.log("abilityq maxed");
+                                }
+                                
+                                if(game.data.player.ability2 === 0){
+                                    this.font.draw(context, "AbilityW: Level1 - Stop It, That Tickles! (Infinite Armor) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 1){
+                                    this.font.draw(context, "AbilityW: Level2 - Stop It, That Tickles! (Infinite Armor) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else if(game.data.player.ability2 === 2){
+                                    this.font.draw(context, "AbilityW: Level3 - Stop It, That Tickles! (Infinite Armor) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 300));
+                                }
+                                else{
+                                    console.log("abilityw maxed");
+                                }
+                                
+                                if(game.data.player.ability3 === 0){
+                                    this.font.draw(context, "AbilityE: Level1 - ONE OF US! ONE OF US! (Kill your target) Cost: 10", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 1){
+                                    this.font.draw(context, "AbilityE: Level2 - ONE OF US! ONE OF US! (Kill your target) Cost: 20", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else if(game.data.player.ability3 === 2){
+                                    this.font.draw(context, "AbilityE: Level3 - ONE OF US! ONE OF US! (Kill your target) Cost: 30", (game.data.pausePos.x + 10), (game.data.pausePos.y + 350));
+                                }
+                                else{
+                                    console.log("abilitye maxed");
+                                }          
+                            }
+                            else{
+                                console.log("Character shop error");
+                            }
+                            
+                        }
+
+                    }));
+                    me.game.world.addChild(game.data.buytext, 35);
+                    me.game.world.addChild(game.data.buytext2, 35);
                 }
                  else if(me.input.isKeyPressed("buy") && this.buying && this.now-this.lastBuy >= 1000){
                     this.buying = false;
@@ -1368,6 +1786,7 @@ game.GameManager = Object.extend({
                     game.data.player.setVelocity(20, 20);             //NEED TO ADD A GLOBAL VARIABLE HERE
                     me.game.world.removeChild(game.data.buyscreen);
                     me.game.world.removeChild(game.data.buytext);
+                    me.game.world.removeChild(game.data.buytext2);
                 }
                 
                 if(me.input.isKeyPressed("pause") && !this.paused && this.now-this.lastPause >= 1000){

@@ -52,7 +52,7 @@ game.TitleScreen = me.ScreenObject.extend({
                 
                 newGame: function(x){
                     me.input.releasePointerEvent('pointerdown', this);
-                    me.state.change(me.state.CHARSELECT);
+                    me.state.change(me.state.SPENDEXP);
                     //me.state.change(me.state.LOADPROFILE);
                 }
                 
