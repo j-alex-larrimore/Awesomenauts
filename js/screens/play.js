@@ -13,6 +13,8 @@ game.PlayScreen = me.ScreenObject.extend({
 
 		// add our HUD to the game world
                 
+                //me.audio.playTrack("oldschool");
+                
                 if(me.save.exp != null){
                     console.log("Loading exp = " + me.save.exp);
                     game.data.exp = me.save.exp;
@@ -20,7 +22,7 @@ game.PlayScreen = me.ScreenObject.extend({
                 else{
                     console.log("no save data");
                 }
-                game.data.gold = 0;
+                game.data.gold = 10;
                 
 		this.HUD = new game.HUD.Container();
 		me.game.world.addChild(this.HUD);
@@ -33,6 +35,7 @@ game.PlayScreen = me.ScreenObject.extend({
 	 */
 	onDestroyEvent: function() {
 		// remove the HUD from the game world
+                //me.audio.stopTrack();
 		me.game.world.removeChild(this.HUD);
 	},
         

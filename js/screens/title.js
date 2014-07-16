@@ -3,6 +3,8 @@ game.TitleScreen = me.ScreenObject.extend({
 	 *  action to perform on state change
 	 */
 	onResetEvent : function() {	
+            me.audio.playTrack("oldschool");
+            
             me.game.world.addChild( new me.SpriteObject (0, 0, me.loader.getImage('title')), -10);
             
             me.game.world.addChild(new (me.Renderable.extend ({
@@ -67,7 +69,7 @@ game.TitleScreen = me.ScreenObject.extend({
 	 *  action to perform when leaving this screen (state change)
 	 */
 	onDestroyEvent : function() {
-            
+            me.audio.stopTrack();
 		//me.input.unbindPointer(me.input.mouse.LEFT); // TODO
 	}
 });

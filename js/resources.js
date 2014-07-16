@@ -11,10 +11,12 @@ game.resources = [
         { name: "miniMap2", type: "image", src: "data/img/miniMap2.png" },
         { name: "orcSpear", type: "image", src: "data/img/orcSpear.png" },
         { name: "archer", type: "image", src: "data/img/archer.png" },
-        { name: "darkelf", type: "image", src: "data/img/darkelf.png" },
+        //{ name: "darkelf", type: "image", src: "data/img/darkelf.png" },
+        { name: "darkelf", type: "image", src: "data/img/elf.png" },
         //{ name: "skeletonDagger", type: "image", src: "data/img/skeletonDagger.png" },
         //{ name: "skeletonBigSword", type: "image", src: "data/img/skeletonBigSword.png" },
-        { name: "skeletonBigSword", type: "image", src: "data/img/skeleton.png" },
+        //{ name: "skeletonBigSword", type: "image", src: "data/img/skeleton.png" },
+        { name: "skeletonBigSword", type: "image", src: "data/img/skeletonDagger.png" },
         { name: "wizard", type: "image", src: "data/img/wizard.png" },
         
         { name: "archerIcon", type: "image", src: "data/img/archerIcon.png" },
@@ -22,12 +24,14 @@ game.resources = [
         { name: "darkelfIcon", type: "image", src: "data/img/darkelfIcon.png" },
         //{ name: "skeletonDaggerIcon", type: "image", src: "data/img/skeletonDaggerIcon.png" },
         { name: "skeletonBigSwordIcon", type: "image", src: "data/img/skeletonBigSwordIcon.png" },
+        //{ name: "skeletonBigSwordIcon", type: "image", src: "data/img/skeletonDaggerIcon.png" },
         { name: "wizardIcon", type: "image", src: "data/img/wizardIcon.png" },
         
         { name: "magic", type: "image", src: "data/img/magic.png" },
         { name: "spear", type: "image", src: "data/img/spear.png" },
         { name: "fireball", type: "image", src: "data/img/fireball.png" },
         { name: "arrow", type: "image", src: "data/img/arrow.png" },
+        { name: "iArrow", type: "image", src: "data/img/iArrow.png" },
         
         { name: "creep1", type: "image", src: "data/img/gloop.png"},
         { name: "creep2", type: "image", src: "data/img/brainmonster.png"},
@@ -54,15 +58,23 @@ game.resources = [
  	 */
         { name: "mainMap", type: "tmx", src: "data/map/mainMap.tmx"},
         { name: "test", type: "tmx", src: "data/map/test.tmx"},
-        { name: "emptyMap", type: "tmx", src: "data/map/emptyMap.tmx" }
+        { name: "emptyMap", type: "tmx", src: "data/map/emptyMap.tmx" },
 
 	/* Background music. 
 	 * @example
 	 * {name: "example_bgm", type: "audio", src: "data/bgm/"},
 	 */	
 
+        //{name: "battle",  type: "audio", src: "data/bgm/"},
+        {name: "oldschool",  type: "audio", src: "data/bgm/"},
+
 	/* Sound effects. 
 	 * @example
 	 * {name: "example_sfx", type: "audio", src: "data/sfx/"}
 	 */
+        
+        //{name: "laser8",  type: "audio", src: "data/sfx/"},
+        {name: "ManHurt",  type: "audio", src: "data/sfx/"},
+        //{name: "arrowshot",  type: "audio", src: "data/sfx/"},
+        
 ];

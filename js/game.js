@@ -86,7 +86,8 @@ var game = {
         me.sys.resumeOnFocus = false;
         
 	// Initialize the audio.
-	me.audio.init("mp3,ogg");
+        me.audio.init("ogg");
+	//me.audio.init("mp3,ogg");
 
 	// Set a callback to run when loading is complete.
 	me.loader.onload = this.loaded.bind(this);
@@ -134,6 +135,7 @@ var game = {
                 me.pool.register("fireball", game.Fireball, true);
                 me.pool.register("magic", game.MagicMissile, true);
                 me.pool.register("spear", game.SpearThrow, true);
+                me.pool.register("iArrow", game.RootArrow, true);
 
                 me.input.bindKey(me.input.KEY.RIGHT, "right");
                 me.input.bindKey(me.input.KEY.LEFT, "left");
@@ -142,6 +144,10 @@ var game = {
                 me.input.bindKey(me.input.KEY.TAB, "toggleMap");
                 me.input.bindKey(me.input.KEY.P, "pause");
                 me.input.bindKey(me.input.KEY.B, "buy");
+                me.input.bindKey(me.input.KEY.Q, "Q");
+                me.input.bindKey(me.input.KEY.W, "W");
+                me.input.bindKey(me.input.KEY.E, "E");
+                me.input.bindKey(me.input.KEY.DOWN, "down");
             
             // Start the game.
 		me.state.change(me.state.MENU);

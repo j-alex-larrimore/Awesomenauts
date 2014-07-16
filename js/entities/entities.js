@@ -27,7 +27,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
            this.setVelocity(game.data.elfBaseSpeed, 20);
            game.data.mySpeed = game.data.elfBaseSpeed;
            this.renderable.addAnimation("idle", [78]);
-           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);                    //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
@@ -66,7 +66,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
            this.setVelocity(game.data.skeletonBaseSpeed, 20);
            game.data.mySpeed = game.data.skeletonBaseSpeed;
            this.renderable.addAnimation("idle", [78]);
-           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);       
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
@@ -89,11 +89,15 @@ game.PlayerEntity = me.ObjectEntity.extend({
        this.ability1 = 0;
        this.ability2 = 0;
        this.ability3 = 0;
+       this.ability1CD = 0;
+       this.ability2CD = 0;
+       this.ability3CD = 0;
        this.team = true;
        this.range = 100;
+       this.penetrate = false; //used for archer's first skill
        
        this.collidable = true;
-       
+              
        if(game.data.exp3 === 1){
            this.attack += 5;
        }
@@ -132,7 +136,100 @@ game.PlayerEntity = me.ObjectEntity.extend({
        }
        else
            this.health --;
-   }, 
+   },
+           
+   useAbility: function(num, level){
+       this.now = new Date().getTime();
+       
+       if(game.data.character === 1){       //ARCHER
+           if(num === 1){
+               if (level === 1){
+                   this.penetrate = true;
+                   this.qTime = this.now + 5000;
+                   this.ability1CD = this.now + 30000;
+               }
+               else if (level === 2){
+                   this.penetrate = true;
+                   this.qTime = this.now + 10000;
+                   this.ability1CD = this.now + 30000;
+               }
+               else if (level === 3){
+                   this.penetrate = true;
+                   this.qTime = this.now + 15000;
+                   this.ability1CD = this.now + 30000;
+               }
+           }
+           else if (num === 2){
+               if (level === 1){
+                   this.ability2CD = this.now + 30000;
+               }
+               else if (level === 2){
+                   this.ability2CD = this.now + 30000;
+               }
+               else if (level === 3){
+                   this.ability2CD = this.now + 30000;
+               }
+           }
+           else if (num === 3){
+               if (level === 1){
+                   
+               }
+               else if (level === 2){
+                   
+               }
+               else if (level === 3){
+                   
+               }
+           }
+       }
+       else if(game.data.character === 2){      //ELF
+           
+       }
+       else if(game.data.character === 3){      //ORC
+           
+       }
+       else if(game.data.character === 4){      //WIZARD
+           if(num === 1){
+               if (level === 1){
+               }
+               else if (level === 2){
+               }
+               else if (level === 3){
+               }
+           }
+           else if (num === 2){
+               if (level === 1){
+                   this.fireball = me.pool.pull("fireball", this.pos.x + 32, this.pos.y + 26, {}, 30, 500, this.facing, 1);
+                   me.game.world.addChild(this.fireball, 10);
+                   this.ability2CD = this.now + 30000;
+               }
+               else if (level === 2){
+                   this.fireball = me.pool.pull("fireball", this.pos.x + 32, this.pos.y + 26, {}, 60, 700, this.facing, 1);
+                   me.game.world.addChild(this.fireball, 10);
+                   this.ability2CD = this.now + 30000;
+               }
+               else if (level === 3){
+                   this.fireball = me.pool.pull("fireball", this.pos.x + 32, this.pos.y + 26, {}, 90, 900, this.facing, 1);
+                   me.game.world.addChild(this.fireball, 10);
+                   this.ability2CD = this.now + 30000;
+               }
+            }
+           else if (num === 3){
+               if (level === 1){
+                   
+               }
+               else if (level === 2){
+                   
+               }
+               else if (level === 3){
+                   
+               }
+           }
+       }
+       else if(game.data.character === 5){      //SKELETON
+           
+       }
+   },         
           
     
    update: function(delta){
@@ -141,6 +238,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
        if (this.health <= 0){
            if(this.dead === false){
                 this.deathtimer = new Date().getTime();
+                me.audio.play("ManHurt");
                 this.renderable.setCurrentAnimation("die");
                 this.renderable.setAnimationFrame();
                 this.dead = true;
@@ -174,6 +272,15 @@ game.PlayerEntity = me.ObjectEntity.extend({
            this.vel.x = 0;
        }
        
+       if(this.penetrate){
+           if(this.now >= this.qTime){
+               console.log("Arrows penetrate");
+               this.penetrate = false;
+           }
+           
+       }
+       
+       
        if(this.vel.x !== 0){
             if(!this.renderable.isCurrentAnimation("run") && !this.renderable.isCurrentAnimation("attack") && !this.renderable.isCurrentAnimation("die")){
                 this.renderable.setCurrentAnimation("run");
@@ -189,7 +296,7 @@ game.PlayerEntity = me.ObjectEntity.extend({
                this.last = this.now;
                this.renderable.setCurrentAnimation("attack", "idle");
                if(game.data.character === 1){
-                    this.arrow = me.pool.pull("arrow", this.pos.x + 32, this.pos.y + 26, {}, this.attack, this.range, this.facing, 1);
+                    this.arrow = me.pool.pull("arrow", this.pos.x + 32, this.pos.y + 26, {}, this.attack, this.range, this.facing, 1, this.penetrate);
                     me.game.world.addChild(this.arrow, 10);
                }
                if(game.data.character === 4){
@@ -200,6 +307,35 @@ game.PlayerEntity = me.ObjectEntity.extend({
            }
        }
        
+       if(me.input.isKeyPressed("Q") && this.ability1 > 0 && this.now>=this.ability1CD){
+           this.useAbility(1, this.ability1);
+       }
+       
+       if(me.input.isKeyPressed("W") && this.ability2 > 0 && this.now>=this.ability2CD){
+
+           this.useAbility(2, this.ability2);
+       }
+       
+       if(me.input.isKeyPressed("E") && this.ability3 > 0 && this.now>=this.ability3CD){
+           this.useAbility(3, this.ability3);
+       }
+       
+       if(me.input.isKeyPressed("down")){    
+//           var layer = me.game.currentLevel.getLayerByName("collision");
+//           var tile = layer.getTile(this.pos.x, this.pos.y + 65);
+//           var tileProperties = layer.tileset.getTileProperties(tile.tileID); //
+//           //var tile = layer.layerData(this.pos.x, this.pos.y + 65); //says layer.layerData is not a function
+//           //var tile = layer.layerData[this.pos.x][this.pos.y+65]; //returns nothing
+//           
+//           
+//           console.log("Tile?" + tileProperties.type === "platform"); //says tileProperties is undefined
+//           //console.log("Tile?" + layer.tileset.getTileId(this.pos.x, this.pos.y + 65)); //says layer.tileset.getTileId is not a function
+//       
+//           if(tileProperties.type === "platform"){
+//               this.pos.y += 10;
+//           }
+       }
+       
        if(me.input.isKeyPressed("jump") && !this.jumping && !this.falling){
             this.jumping = true;
             this.vel.y -= this.accel.y * me.timer.tick;
@@ -208,11 +344,13 @@ game.PlayerEntity = me.ObjectEntity.extend({
        
        
               
-       //var collision = me.game.world.collide(this);
+        //var collision = me.game.world.collide(this);  //TESTING
         var bcollision = me.game.world.collideType(this, "EnemyBaseEntity");
         var pcollision = me.game.world.collideType(this, "EnemyEntity");
         var ccollision = me.game.world.collideType(this, "EnemyCreep");
         this.now = new Date().getTime();
+       
+       
        
         if(bcollision){
             var ydif = this.pos.y - bcollision.obj.pos.y;
@@ -780,6 +918,7 @@ game.EnemyCreep = me.ObjectEntity.extend({
                  
         }
         else if(ccollision){
+            //console.log("Hitting a player creep " + this.pos.x);
             this.vel.x = 0;
             this.pos.x = this.pos.x + 1;
             this.attacking = true;
@@ -959,7 +1098,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
            this.defense = game.data.elfBaseDef;
            this.setVelocity(game.data.elfBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
-           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);                    //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
@@ -995,7 +1134,7 @@ game.EnemyEntity = me.ObjectEntity.extend({
            this.defense = game.data.skeletonBaseDef;
            this.setVelocity(game.data.skeletonBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
-           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);        //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
@@ -1182,7 +1321,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
            this.defense = game.data.elfBaseDef;
            this.setVelocity(game.data.elfBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
-           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);                    //ASK MOISES
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);                    //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
@@ -1218,7 +1357,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
            this.defense = game.data.skeletonBaseDef;
            this.setVelocity(game.data.skeletonBaseSpeed, 20);
            this.renderable.addAnimation("idle", [78]);
-           this.renderable.addAnimation("attack", [65, 66, 67, 68, 69, 70, 71, 72], 80);        //ASK MOISES
+           this.renderable.addAnimation("attack", [169, 170, 171, 172, 173, 174], 80);        //ASK MOISES
            this.renderable.addAnimation("run", [117, 118, 119, 120, 121, 122, 123, 124, 125], 80);
            this.renderable.addAnimation("die", [260, 261, 262, 263, 264, 265], 80);
        }
@@ -1351,7 +1490,7 @@ game.PlayerTeammate = me.ObjectEntity.extend({
 });
 
 game.ArrowEntity = me.ObjectEntity.extend({
-    init: function (x, y, settings, dmg, rng, dir, team){
+    init: function (x, y, settings, dmg, rng, dir, team, pen){
         settings.spritewidth = "24";
         settings.spriteheight = "24";
         settings.width = 24;
@@ -1368,10 +1507,18 @@ game.ArrowEntity = me.ObjectEntity.extend({
         this.last = new Date().getTime();
         this.now = new Date().getTime();
         this.stuck = false;
+        this.penetrate = pen;
+        this.alwaysUpdate = true;
         
         this.renderable.addAnimation("idle", [0]);
         
         this.setVelocity (10, 0);
+    },
+            
+    endCollide: function(){
+        if(!this.penetrate){
+            me.game.world.removeChild(this);
+        }
     },
     
     update: function(delta){
@@ -1393,15 +1540,23 @@ game.ArrowEntity = me.ObjectEntity.extend({
 
             if(bcollision){
                  bcollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
             }
             else if(pcollision){
                  pcollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
+                 if(pcollision.obj.health <= this.attack){
+                        game.data.gold += 10;
+                        console.log("Current gold: " + game.data.gold);
+                    }
             }
             else if(ccollision){
+                if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  ccollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
             }
             
             if(this.pos.x === this.lastPosX && this.stuck === false){
@@ -1425,19 +1580,23 @@ game.ArrowEntity = me.ObjectEntity.extend({
 
             if(bcollision){
                  bcollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
             }
             else if(tcollision){
                  tcollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
             }
             else if(pcollision){
                  pcollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
             }
             else if(ccollision){
                  ccollision.obj.loseHealth(this.attack);
-                 me.game.world.removeChild(this);
+                 this.endCollide();
+                 if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
             }
             
             if(this.pos.x === this.lastPosX && this.stuck === false){
@@ -1480,6 +1639,7 @@ game.MagicMissile = me.ObjectEntity.extend({
         this.last = new Date().getTime();
         this.now = new Date().getTime();
         this.stuck = false;
+        this.alwaysUpdate = true;
         
         this.renderable.addAnimation("idle", [0]);
         
@@ -1508,10 +1668,18 @@ game.MagicMissile = me.ObjectEntity.extend({
                  me.game.world.removeChild(this);
             }
             else if(pcollision){
+                if(pcollision.obj.health <= this.attack){
+                        game.data.gold += 10;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  pcollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
             else if(ccollision){
+                if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  ccollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
@@ -1591,6 +1759,7 @@ game.SpearThrow = me.ObjectEntity.extend({
         this.last = new Date().getTime();
         this.now = new Date().getTime();
         this.stuck = false;
+        this.alwaysUpdate = true;
         
         this.renderable.addAnimation("idle", [0]);
         
@@ -1618,11 +1787,19 @@ game.SpearThrow = me.ObjectEntity.extend({
                  bcollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
-            else if(pcollision){
+            else if(ccollision){
+                if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 10;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  pcollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
             else if(ccollision){
+                if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  ccollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
@@ -1702,16 +1879,22 @@ game.Fireball = me.ObjectEntity.extend({
         this.last = new Date().getTime();
         this.now = new Date().getTime();
         this.stuck = false;
+        this.alwaysUpdate = true;
         
         this.renderable.addAnimation("idle", [0]);
         
         this.setVelocity (10, 0);
+        console.log("HERE IT COMES!");
+        
     },
     
     update: function(delta){
         this.now = new Date().getTime();
+        console.log(this.pos.x + " " + this.pos.y + " " + this.attack + " " + this.range + " " + this.facing + " " + this.team );
+        
         
         if(this.facing === "right"){
+           console.log("GOING RIGHT");
            this.vel.x += this.accel.x * me.timer.tick;
            
        }
@@ -1730,10 +1913,18 @@ game.Fireball = me.ObjectEntity.extend({
                  me.game.world.removeChild(this);
             }
             else if(pcollision){
+                if(pcollision.obj.health <= this.attack){
+                        game.data.gold += 10;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  pcollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
             else if(ccollision){
+                if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
                  ccollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
             }
@@ -1772,6 +1963,137 @@ game.Fireball = me.ObjectEntity.extend({
             else if(ccollision){
                  ccollision.obj.loseHealth(this.attack);
                  me.game.world.removeChild(this);
+            }
+            
+            if(this.pos.x === this.lastPosX && this.stuck === false){
+                this.last = this.now;
+                this.stuck = true;
+            }
+            
+            if(this.pos.x >= this.endX || (this.pos.x === this.lastPosX && (this.now - this.last > 200) && this.stuck === true)){
+                me.game.world.removeChild(this);
+            }
+            
+            if(this.now - this.last >= 2000){
+                this.stuck = false;
+            }
+            
+       }
+        this.lastPosX = this.pos.x;
+        this.updateMovement();
+        this.parent(delta);
+        return true;
+     }
+});
+
+game.RootArrow = me.ObjectEntity.extend({
+    init: function (x, y, settings, dmg, rng, dir, team, pen){
+        settings.spritewidth = "48";
+        settings.spriteheight = "48";
+        settings.width = 48;
+        settings.height = 48;
+        settings.image = "iArrow";
+        this.parent(x, y, settings);
+        this.attack = dmg;
+        this.range = rng;
+        this.startX = x;
+        this.endX = (this.startX + rng);
+        this.facing = dir;
+        this.team = team;
+        this.lastPosX = x;
+        this.last = new Date().getTime();
+        this.now = new Date().getTime();
+        this.stuck = false;
+        this.penetrate = pen;
+        this.alwaysUpdate = true;
+        
+        this.renderable.addAnimation("idle", [0]);
+        
+        this.setVelocity (10, 0);
+    },
+    
+    endCollide: function(){
+        if(!this.penetrate){
+            me.game.world.removeChild(this);
+        }
+    },
+    
+    update: function(delta){
+        this.now = new Date().getTime();
+        
+        if(this.facing === "right"){
+           this.vel.x += this.accel.x * me.timer.tick;
+           
+       }
+       else if(this.facing === "left"){
+           this.flipX(true);
+           this.vel.x -= this.accel.x * me.timer.tick;
+       }
+       
+       if(this.team === 1){
+            var bcollision = me.game.world.collideType(this, "EnemyBaseEntity");
+            var pcollision = me.game.world.collideType(this, "EnemyEntity");
+            var ccollision = me.game.world.collideType(this, "EnemyCreep");
+
+            if(bcollision){
+                 bcollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+            }
+            else if(pcollision){
+                 pcollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+                 if(pcollision.obj.health <= this.attack){
+                        game.data.gold += 10;
+                        console.log("Current gold: " + game.data.gold);
+                    }
+            }
+            else if(ccollision){
+                if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
+                 ccollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+            }
+            
+            if(this.pos.x === this.lastPosX && this.stuck === false){
+                this.last = this.now;
+                this.stuck = true;
+            }
+            
+            if(this.pos.x >= this.endX || (this.pos.x === this.lastPosX && (this.now - this.last > 200) && this.stuck === true)){
+                me.game.world.removeChild(this);
+            }
+            
+            if(this.now - this.last >= 2000){
+                this.stuck = false;
+            }
+       }
+       else if(this.team === 2){
+            var tcollision = me.game.world.collideType(this, "PlayerTeammate");
+            var bcollision = me.game.world.collideType(this, "PlayerBaseEntity");
+            var pcollision = me.game.world.collideType(this, "PlayerEntity");
+            var ccollision = me.game.world.collideType(this, "PlayerCreep");
+
+            if(bcollision){
+                 bcollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+            }
+            else if(tcollision){
+                 tcollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+            }
+            else if(pcollision){
+                 pcollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+            }
+            else if(ccollision){
+                 ccollision.obj.loseHealth(this.attack);
+                 this.endCollide();
+                 if(ccollision.obj.health <= this.attack){
+                        game.data.gold += 1;
+                        console.log("Current gold: " + game.data.gold);
+                    }
             }
             
             if(this.pos.x === this.lastPosX && this.stuck === false){
@@ -2409,17 +2731,17 @@ game.GameManager = Object.extend({
                     if(game.data.player.ability1 === 0 && game.data.gold >= 10){
                         game.data.player.ability1 += 1;
                         game.data.gold -= 10;
-                        this.powerUp(4);
+                        
                     }
                     else if(game.data.player.ability1 === 1 && game.data.gold >= 20){
                         game.data.player.ability1 += 1;
                         game.data.gold -= 20;
-                        this.powerUp(4);
+                        
                     }
                     else if(game.data.player.ability1 === 2 && game.data.gold >= 30){
                         game.data.player.ability1 += 1;
                         game.data.gold -= 30;
-                        this.powerUp(4);
+                        
                     }
                 }
                 
@@ -2428,17 +2750,17 @@ game.GameManager = Object.extend({
                     if(game.data.player.ability2 === 0 && game.data.gold >= 10){
                         game.data.player.ability2 += 1;
                         game.data.gold -= 10;
-                        this.powerUp(5);
+                        
                     }
                     else if(game.data.player.ability2 === 1 && game.data.gold >= 20){
                         game.data.player.ability2 += 1;
                         game.data.gold -= 20;
-                        this.powerUp(5);
+                        
                     }
                     else if(game.data.player.ability2 === 2 && game.data.gold >= 30){
                         game.data.player.ability2 += 1;
                         game.data.gold -= 30;
-                        this.powerUp(5);
+                        
                     }
                 }
                 
@@ -2447,17 +2769,17 @@ game.GameManager = Object.extend({
                     if(game.data.player.ability3 === 0 && game.data.gold >= 10){
                         game.data.player.ability3 += 1;
                         game.data.gold -= 10;
-                        this.powerUp(6);
+                        
                     }
                     else if(game.data.player.ability3 === 1 && game.data.gold >= 20){
                         game.data.player.ability3 += 1;
                         game.data.gold -= 20;
-                        this.powerUp(6);
+                        
                     }
                     else if(game.data.player.ability3 === 2 && game.data.gold >= 30){
                         game.data.player.ability3 += 1;
                         game.data.gold -= 30;
-                        this.powerUp(6);
+                       
                     }
                 }
                 
@@ -2502,7 +2824,7 @@ game.GameManager = Object.extend({
        if(skill === 1){
             if((game.data.character === 1)){
                 console.log("Old Range: ");
-                game.data.player.range += 100;
+                game.data.player.range += 150;
                 console.log("New Range: ");
             }
             else if((game.data.character === 2)){
@@ -2517,7 +2839,7 @@ game.GameManager = Object.extend({
                 console.log("New Health: " + game.data.player.maxHealth);
             }
             else if((game.data.character === 4)){
-                game.data.player.range += 100;            
+                game.data.player.range += 150;            
             }
             else if((game.data.character === 5)){
                 game.data.player.defense += 2;            
@@ -2547,7 +2869,7 @@ game.GameManager = Object.extend({
        }
        if(skill === 3){
             if((game.data.character === 1)){
-                game.data.player.range += 100;       
+                game.data.player.range += 150;       
             }
             else if((game.data.character === 2)){
                 game.data.mySpeed ++;
@@ -2563,57 +2885,6 @@ game.GameManager = Object.extend({
                 game.data.player.attack += 5;           
             }
        }
-       if(skill === 4){
-            if((game.data.character === 1)){
-                        
-            }
-            else if((game.data.character === 2)){
-                
-            }
-            else if((game.data.character === 3)){
-                
-            }
-            else if((game.data.character === 4)){
-                            
-            }
-            else if((game.data.character === 5)){
-                            
-            }
-       }
-       if(skill === 5){
-            if((game.data.character === 1)){
-                        
-            }
-            else if((game.data.character === 2)){
-                
-            }
-            else if((game.data.character === 3)){
-                
-            }
-            else if((game.data.character === 4)){
-                            
-            }
-            else if((game.data.character === 5)){
-                            
-            }
-       }
-       if(skill === 6){
-            if((game.data.character === 1)){
-                        
-            }
-            else if((game.data.character === 2)){
-                
-            }
-            else if((game.data.character === 3)){
-                
-            }
-            else if((game.data.character === 4)){
-                            
-            }
-            else if((game.data.character === 5)){
-                            
-            }
-       } 
-   } 
+   }
      
 });
